@@ -60,6 +60,8 @@ export default function TeamPage({
                     : seat && "code" in seat
                     ? seat.source === "booked"
                       ? "จองเอง"
+                      : seat.source === "fixed"
+                      ? "ที่นั่งประจำ"
                       : "อัตโนมัติ"
                     : "-"}
                 </td>

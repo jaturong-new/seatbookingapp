@@ -47,9 +47,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </nav>
             </div>
  
-            <Link href="/admin" className="rounded-full bg-[#002f40] border border-[#04a4cc]/25 px-4 py-1.5 text-xs font-semibold text-cyan-100 transition-all hover:bg-[#04a4cc]/20 hover:text-white">
-              Admin
-            </Link>
           </div>
         </header>
         <main className="mx-auto max-w-[98vw] px-6 py-4 animate-fade-in-up">

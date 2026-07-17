@@ -165,7 +165,7 @@ export function getEmployeeWeekSeat(employeeId: number, weekStart: string): Empl
 
 export type TeamWeekRow = {
   employee: Employee;
-  seat: (Seat & { floor_code: string; source: "booked" | "auto" }) | { source: "wfh" } | null;
+  seat: (Seat & { floor_code: string; source: "booked" | "auto" | "fixed" }) | { source: "wfh" } | null;
 };
 
 export function getTeamWeekView(teamId: number, weekStart: string): TeamWeekRow[] {
