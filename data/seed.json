@@ -528,7 +528,7 @@
       "floor_code": "F32",
       "row_letter": "Fixed",
       "col_number": 2,
-      "code": "F32-E4",
+      "code": "อภิมุข ดำอ่อน",
       "full_code": "F32-FIXEDDEV-2",
       "grid_row": 15,
       "grid_col": 11
@@ -1342,6 +1342,11 @@
     {
       "name": "นิตินัย",
       "team_name": "DEV"
+    },
+    {
+      "name": "อภิมุข ดำอ่อน",
+      "team_name": "DEV",
+      "group_number": 3
     }
   ],
   "team_seats": [
