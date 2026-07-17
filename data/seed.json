@@ -222,7 +222,7 @@
       "floor_code": "F5",
       "row_letter": "F",
       "col_number": 3,
-      "code": "F3",
+      "code": "วสันต์ เพียรมาก",
       "full_code": "F5-F3",
       "grid_row": 94,
       "grid_col": 5
@@ -231,7 +231,7 @@
       "floor_code": "F5",
       "row_letter": "F",
       "col_number": 4,
-      "code": "F4",
+      "code": "พัลลภ นุตาลัย",
       "full_code": "F5-F4",
       "grid_row": 94,
       "grid_col": 6
@@ -258,7 +258,7 @@
       "floor_code": "F5",
       "row_letter": "G",
       "col_number": 4,
-      "code": "G4",
+      "code": "อัญดาธร ชมภูวงค์",
       "full_code": "F5-G4",
       "grid_row": 95,
       "grid_col": 6
@@ -1135,6 +1135,24 @@
       "full_code": "F32-NOSEAT-49-10",
       "grid_row": 49,
       "grid_col": 10
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "I",
+      "col_number": 2,
+      "code": "I2",
+      "full_code": "F5-I2",
+      "grid_row": 93,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Fixed",
+      "col_number": 1,
+      "code": "วรัชยานันทน์ พิภัชสิทธา",
+      "full_code": "วรัชยานันทน์ พิภัชสิทธา",
+      "grid_row": 94,
+      "grid_col": 10
     }
   ],
   "teams": [
@@ -1352,6 +1370,16 @@
       "name": "ธนาวุฒิ ประเสริฐสังข์",
       "team_name": "DEV",
       "group_number": 4
+    },
+    {
+      "name": "พัลลภ นุตาลัย",
+      "team_name": "DEV",
+      "group_number": 5
+    },
+    {
+      "name": "อัญดาธร ชมภูวงค์",
+      "team_name": "DEV",
+      "group_number": 6
     }
   ],
   "team_seats": [
@@ -1472,16 +1500,6 @@
     },
     {
       "team_name": "DEV",
-      "seat_full_code": "F5-F3",
-      "pool_order": 23
-    },
-    {
-      "team_name": "DEV",
-      "seat_full_code": "F5-F4",
-      "pool_order": 24
-    },
-    {
-      "team_name": "DEV",
       "seat_full_code": "F5-G2",
       "pool_order": 25
     },
@@ -1492,7 +1510,7 @@
     },
     {
       "team_name": "DEV",
-      "seat_full_code": "F5-G4",
+      "seat_full_code": "F5-I2",
       "pool_order": 27
     }
   ],
