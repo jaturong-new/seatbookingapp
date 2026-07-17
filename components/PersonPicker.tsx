@@ -29,22 +29,24 @@ export default function PersonPicker() {
   }, []);
 
   return (
-    <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-white/70 backdrop-blur px-4 py-2.5 shadow-sm transition-all focus-within:ring-2 focus-within:ring-ocean-500 focus-within:border-transparent">
-      <label className="text-sm font-medium text-slate-500 flex items-center gap-1.5" htmlFor="person-picker">
-        <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className={`flex items-center gap-3 rounded-full border px-4 py-2.5 shadow-md transition-all backdrop-blur focus-within:ring-2 focus-within:ring-blue-500/40 focus-within:border-transparent ${
+      employeeId ? "border-blue-500/20 bg-[#0a1535]/80" : "border-amber-500/40 bg-amber-500/10"
+    }`}>
+      <label className={`text-sm font-medium flex items-center gap-1.5 ${employeeId ? "text-blue-300/70" : "text-amber-300"}`} htmlFor="person-picker">
+        <svg className={`w-4 h-4 ${employeeId ? "text-blue-400/60" : "text-amber-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
         ระบุตัวตน:
       </label>
       <select
         id="person-picker"
-        className="bg-transparent text-sm font-semibold text-ocean-900 outline-none cursor-pointer pr-4"
+        className="bg-transparent text-sm font-semibold text-white outline-none cursor-pointer pr-4"
         value={employeeId ?? ""}
         onChange={(e) => setStoredEmployeeId(e.target.value ? Number(e.target.value) : null)}
       >
-        <option value="" className="bg-white text-slate-400">-- กรุณาเลือกชื่อของคุณ --</option>
+        <option value="" className="bg-[#081228] text-blue-300/60">-- กรุณาเลือกชื่อของคุณ --</option>
         {employees.map((e) => (
-          <option key={e.id} value={e.id} className="bg-white text-ocean-900">
+          <option key={e.id} value={e.id} className="bg-[#081228] text-white">
             {e.name} ({e.team_name})
           </option>
         ))}

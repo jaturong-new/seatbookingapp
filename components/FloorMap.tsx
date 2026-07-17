@@ -35,7 +35,7 @@ function formatSeatLabel(code: string, source: string): string {
   return code;
 }
 
-export default function FloorMap({ seats, weekStart }: { seats: SeatVM[]; weekStart: string }) {
+export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatVM[]; weekStart: string; floorName?: string }) {
   const router = useRouter();
   const employeeId = usePersonIdentity();
   const [pending, setPending] = useState<number | null>(null);
@@ -77,37 +77,61 @@ export default function FloorMap({ seats, weekStart }: { seats: SeatVM[]; weekSt
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap gap-4 text-xs font-semibold px-4 py-3 bg-[#0a1535]/80 rounded-2xl border border-blue-500/15 shadow-lg backdrop-blur-sm w-fit">
-        <Legend swatch="border-dashed border-slate-300 bg-transparent" label="ว่าง" />
+      <div className="mb-6 flex flex-wrap gap-5 text-sm font-semibold px-5 py-3.5 bg-[#0a1535]/80 rounded-2xl border border-blue-500/15 shadow-lg backdrop-blur-sm w-fit">
+        <Legend swatch="bg-emerald-50 border-emerald-300" label="ว่าง จองได้" />
         <Legend swatch="bg-blue-50 border-blue-200" label="หมุนเวียน (auto)" />
         <Legend swatch="bg-gradient-to-br from-blue-500 to-blue-700 border-blue-600" label="จองเอง (booked)" />
         <Legend swatch="bg-gradient-to-br from-amber-100 to-amber-200 border-amber-300" label="ที่นั่งประจำ (fixed)" />
         {employeeId && <Legend swatch="ring-2 ring-blue-500 bg-white border-slate-200" label="ที่นั่งของฉัน" />}
       </div>
 
-      <div className="overflow-x-auto pb-8 flex justify-center">
+      <div className="overflow-x-auto pb-8">
+        <div className="mx-auto w-fit">
+          {floorName && (
+            <div className="mb-5 rounded-2xl bg-gradient-to-r from-[#101b45] via-[#1b2a6b] to-[#101b45] px-6 py-3.5 text-center text-xl font-extrabold tracking-[0.3em] text-white shadow-lg border border-blue-400/20 uppercase">
+              {floorName}
+            </div>
+          )}
         <div
-          className="inline-grid gap-2 p-6 rounded-[2rem] border border-slate-200/80 shadow-2xl bg-[radial-gradient(rgba(59,130,246,0.1)_1px,transparent_1px)] [background-size:16px_16px] bg-white"
+          className="inline-grid gap-3.5 p-10 rounded-[2rem] border border-slate-200/80 shadow-2xl bg-[radial-gradient(rgba(59,130,246,0.1)_1px,transparent_1px)] [background-size:20px_20px] bg-white"
           style={{
-            gridTemplateRows: `repeat(${rowCount}, 3.5rem)`,
-            gridTemplateColumns: `repeat(${colCount}, 4.5rem)`,
+            gridTemplateRows: `repeat(${rowCount}, 5rem)`,
+            gridTemplateColumns: `repeat(${colCount}, 7.5rem)`,
           }}
         >
           {seats.map((seat) => {
+            if (seat.code.startsWith("Meeting Room")) {
+              const colSpan = seat.code.includes("2") ? 3 : 2;
+              return (
+                <div
+                  key={seat.id}
+                  style={{
+                    gridRow: `${seat.grid_row - minRow + 1} / span 2`,
+                    gridColumn: `${seat.grid_col - minCol + 1} / span ${colSpan}`,
+                  }}
+                  className="flex h-full w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-amber-300 bg-gradient-to-br from-amber-50 to-orange-100/70 text-amber-700 shadow-sm select-none cursor-default"
+                  title={seat.code}
+                >
+                  <span className="text-3xl mb-1">🧑‍💼</span>
+                  <span className="font-bold text-base">{seat.code}</span>
+                </div>
+              );
+            }
+
             if (seat.code === "ประตู") {
               return (
                 <div
                   key={seat.id}
                   style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
-                  className="flex h-14 w-[4.5rem] flex-col items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-500 shadow-sm"
-                  title="จุดเข้าออกห้อง"
+                  className="flex h-full w-full flex-col items-center justify-center rounded-xl bg-gradient-to-b from-rose-700 to-rose-900 border border-rose-800 text-white shadow-md"
+                  title="ประตูทางเข้า"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mb-0.5 text-slate-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mb-1 text-rose-100">
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
                     <polyline points="10 17 15 12 10 7"></polyline>
                     <line x1="15" y1="12" x2="3" y2="12"></line>
                   </svg>
-                  <span className="font-bold text-[8px] tracking-wide text-slate-400 uppercase">เข้า - ออก</span>
+                  <span className="font-bold text-xs tracking-wide text-rose-50">ประตูทางเข้า</span>
                 </div>
               );
             }
@@ -117,7 +141,7 @@ export default function FloorMap({ seats, weekStart }: { seats: SeatVM[]; weekSt
                 <div
                   key={seat.id}
                   style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
-                  className="flex h-14 w-[4.5rem] flex-col items-center justify-center rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 shadow-sm font-semibold text-[10px] leading-tight select-none cursor-default"
+                  className="flex h-full w-full flex-col items-center justify-center rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 shadow-sm font-semibold text-xs leading-tight select-none cursor-default"
                   title={seat.code}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mb-0.5 text-emerald-600">
@@ -127,7 +151,7 @@ export default function FloorMap({ seats, weekStart }: { seats: SeatVM[]; weekSt
                     <line x1="3" y1="9" x2="21" y2="9"></line>
                     <line x1="3" y1="15" x2="21" y2="15"></line>
                   </svg>
-                  <span className="truncate w-full text-center px-0.5 text-emerald-700 font-bold text-[9px]">{seat.code}</span>
+                  <span className="truncate w-full text-center px-0.5 text-emerald-700 font-bold text-[11px]">{seat.code}</span>
                 </div>
               );
             }
@@ -137,10 +161,10 @@ export default function FloorMap({ seats, weekStart }: { seats: SeatVM[]; weekSt
                 <div
                   key={seat.id}
                   style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
-                  className="flex h-14 w-[4.5rem] flex-col items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-600 shadow-sm font-medium text-[10px] leading-tight select-none cursor-default"
+                  className="flex h-full w-full flex-col items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-600 shadow-sm font-medium text-xs leading-tight select-none cursor-default"
                   title={seat.code}
                 >
-                  <span className="text-[8px] text-slate-400 uppercase tracking-wider font-bold mb-0.5">EXT</span>
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-0.5">EXT</span>
                   <span className="font-bold text-slate-700 text-[10px]">{seat.code.replace(/ext\.?/i, "").trim()}</span>
                 </div>
               );
@@ -150,14 +174,14 @@ export default function FloorMap({ seats, weekStart }: { seats: SeatVM[]; weekSt
                 <div
                   key={seat.id}
                   style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
-                  className="flex h-14 w-[4.5rem] flex-col items-center justify-center rounded-xl bg-slate-400 border border-slate-500 text-white shadow-sm font-semibold text-[10px] leading-tight select-none cursor-default"
+                  className="flex h-full w-full flex-col items-center justify-center rounded-xl bg-slate-400 border border-slate-500 text-white shadow-sm font-semibold text-xs leading-tight select-none cursor-default"
                   title="ไม่มีที่นั่ง"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mb-0.5 text-slate-100">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                   </svg>
-                  <span className="text-[9px] text-slate-100 font-bold">ไม่มีที่นั่ง</span>
+                  <span className="text-[11px] text-slate-100 font-bold">ไม่มีที่นั่ง</span>
                 </div>
               );
             }
@@ -169,10 +193,10 @@ export default function FloorMap({ seats, weekStart }: { seats: SeatVM[]; weekSt
                 <div
                   key={seat.id}
                   style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
-                  className="flex h-14 w-[4.5rem] flex-col items-center justify-center rounded-xl border border-amber-300 text-amber-800 bg-gradient-to-br from-amber-50 to-amber-100/80 shadow-sm opacity-90 px-1.5 text-center text-[10px] leading-tight select-none cursor-default"
+                  className="flex h-full w-full flex-col items-center justify-center rounded-2xl border border-amber-300 text-amber-800 bg-gradient-to-br from-amber-50 to-amber-100/80 shadow-sm opacity-90 px-2 text-center text-xs leading-tight select-none cursor-default"
                   title={`${seat.code} (ที่นั่งประจำ)`}
                 >
-                  <span className="font-semibold mb-0.5 text-amber-700">{displayLabel}</span>
+                  <span className="font-semibold mb-0.5 text-amber-700">🔒 {displayLabel}</span>
                   <span className="truncate w-full font-medium text-amber-600/70">ประจำ</span>
                 </div>
               );
@@ -184,7 +208,7 @@ export default function FloorMap({ seats, weekStart }: { seats: SeatVM[]; weekSt
                 ? "bg-gradient-to-br from-blue-500 to-blue-700 border-blue-600 text-white shadow-md hover:from-blue-600 hover:to-blue-800 hover:-translate-y-1 hover:shadow-blue-500/20"
                 : seat.source === "auto"
                 ? "bg-blue-50 border-blue-200 text-blue-700 shadow-sm hover:bg-blue-100 hover:text-blue-900 hover:-translate-y-1"
-                : "bg-transparent border-dashed border-slate-300 text-slate-400 hover:border-blue-500 hover:text-blue-600 hover:-translate-y-1";
+                : "bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm hover:bg-emerald-100 hover:border-emerald-400 hover:-translate-y-1";
 
             const employeeName = seat.employee ? formatDisplayName(seat.employee.name) : "ว่าง";
 
@@ -194,22 +218,23 @@ export default function FloorMap({ seats, weekStart }: { seats: SeatVM[]; weekSt
                 onClick={() => setSelected(seat)}
                 disabled={pending === seat.id}
                 style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
-                className={`flex h-14 w-[4.5rem] flex-col items-center justify-center rounded-xl border transition-all duration-300 px-1.5 text-center text-[10px] leading-tight ${base} ${
+                className={`flex h-full w-full flex-col items-center justify-center rounded-2xl border transition-all duration-300 px-2 text-center text-sm leading-tight ${base} ${
                   isMine ? "ring-2 ring-sunset-500 shadow-lg shadow-sunset-500/30 z-10" : ""
                 } ${pending === seat.id ? "opacity-50 scale-95" : ""}`}
                 title={seat.code}
               >
-                <span className={`font-semibold mb-0.5 ${
+                <span className={`font-bold mb-1 text-base ${
                   seat.source === 'booked' ? 'text-white' :
                   seat.source === 'auto' ? 'text-blue-700' :
-                  'text-slate-500'
+                  'text-emerald-700'
                 }`}>{displayLabel}</span>
                 <span className={`truncate w-full font-medium ${
-                  seat.source === 'open' ? 'text-slate-400 italic' : ''
+                  seat.source === 'open' ? 'text-emerald-500 italic' : ''
                 }`}>{employeeName}</span>
               </button>
             );
           })}
+        </div>
         </div>
       </div>
 

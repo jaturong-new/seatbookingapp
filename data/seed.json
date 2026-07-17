@@ -312,6 +312,33 @@
       "full_code": "นิตินัย",
       "grid_row": 95,
       "grid_col": 3
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Room",
+      "col_number": 1,
+      "code": "Meeting Room 1",
+      "full_code": "F5-MEETING-1",
+      "grid_row": 84,
+      "grid_col": 1
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Room",
+      "col_number": 2,
+      "code": "Meeting Room 2",
+      "full_code": "F5-MEETING-2",
+      "grid_row": 84,
+      "grid_col": 3
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Door",
+      "col_number": 1,
+      "code": "ประตู",
+      "full_code": "F5-DOOR-1",
+      "grid_row": 84,
+      "grid_col": 6
     }
   ],
   "teams": [
