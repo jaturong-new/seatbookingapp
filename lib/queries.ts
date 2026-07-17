@@ -47,11 +47,13 @@ export function getTeamByName(name: string): Team | undefined {
   return getDb().prepare(`SELECT * FROM teams WHERE name = ?`).get(name) as Team | undefined;
 }
 
+/** Employees selectable for booking: excludes fixed-seat leads (they already have a permanent seat, nothing to book). */
 export function getEmployees(): (Employee & { team_name: string })[] {
   return getDb()
     .prepare(
       `SELECT e.*, t.name as team_name FROM employees e JOIN teams t ON t.id = e.team_id
-       WHERE e.active = 1 ORDER BY e.name`
+       WHERE e.active = 1 AND NOT EXISTS (SELECT 1 FROM seats s WHERE s.code = e.name)
+       ORDER BY e.name`
     )
     .all() as (Employee & { team_name: string })[];
 }
