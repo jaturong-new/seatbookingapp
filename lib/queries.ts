@@ -1,5 +1,24 @@
+import fs from "fs";
+import path from "path";
 import { getDb } from "./db";
 import { computeAutoOccupants, computeAutoSeat, isGroupWfh } from "./rotation";
+
+type AttendanceRound = { round: number; week_start: string; names: string[] };
+
+let attendanceCache: { byWeek: Map<string, Set<string>>; knownNames: Set<string> } | null = null;
+
+/** Real per-week attendance for DEV, sourced from the "Booking Seat" sheet (round 1 = 2026-08-03).
+ * Falls back to the synthetic group rotation for weeks/employees outside this sheet's coverage
+ * (e.g. someone the sheet never scheduled a seat for at all — not a real "always WFH" signal). */
+function getRealAttendance() {
+  if (attendanceCache) return attendanceCache;
+  const filePath = path.join(process.cwd(), "data", "dev_attendance.json");
+  const rounds: AttendanceRound[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  const byWeek = new Map(rounds.map((r) => [r.week_start, new Set(r.names)]));
+  const knownNames = new Set(rounds.flatMap((r) => r.names));
+  attendanceCache = { byWeek, knownNames };
+  return attendanceCache;
+}
 
 export type Floor = { id: number; code: string; name: string };
 export type Seat = {
@@ -328,7 +347,12 @@ export type ScheduleRow = {
   weeks: { weekStart: string; wfh: boolean }[];
 };
 
-/** Which weeks each rotating team member is in-office vs WFH, for a given list of weeks. Excludes fixed-seat leads — they always attend, nothing to plan around. */
+/**
+ * Which weeks each rotating team member is in-office vs WFH, for a given list of weeks.
+ * Excludes fixed-seat leads — they always attend, nothing to plan around. Uses the real
+ * "Booking Seat" round data where available (source of truth); falls back to the synthetic
+ * group rotation for weeks/employees that sheet doesn't cover.
+ */
 export function getTeamScheduleView(teamId: number, weekStarts: string[]): ScheduleRow[] {
   const roster = getDb()
     .prepare(
@@ -339,11 +363,17 @@ export function getTeamScheduleView(teamId: number, weekStarts: string[]): Sched
     )
     .all(teamId) as Employee[];
 
-  return roster.map((employee) => ({
-    employee,
-    weeks: weekStarts.map((weekStart) => ({
-      weekStart,
-      wfh: isGroupWfh(employee.group_number, weekStart),
-    })),
-  }));
+  const { byWeek, knownNames } = getRealAttendance();
+
+  return roster.map((employee) => {
+    const hasRealData = knownNames.has(employee.name);
+    return {
+      employee,
+      weeks: weekStarts.map((weekStart) => {
+        const attendingThisWeek = hasRealData ? byWeek.get(weekStart) : undefined;
+        const wfh = attendingThisWeek ? !attendingThisWeek.has(employee.name) : isGroupWfh(employee.group_number, weekStart);
+        return { weekStart, wfh };
+      }),
+    };
+  });
 }
