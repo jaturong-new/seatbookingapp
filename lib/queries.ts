@@ -185,26 +185,66 @@ export type BookResult =
   | { ok: true }
   | { ok: false; error: "seat_taken" | "already_booked" | "not_found" };
 
+function getFiveWeeks(weekStart: string): string[] {
+  const dates: string[] = [];
+  const [year, month, day] = weekStart.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+  for (let i = 0; i < 5; i++) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    dates.push(`${y}-${m}-${d}`);
+    date.setDate(date.getDate() + 7);
+  }
+  return dates;
+}
+
 export function bookSeat(seatId: number, weekStart: string, employeeId: number): BookResult {
   const db = getDb();
   const seat = db.prepare(`SELECT * FROM seats WHERE id = ?`).get(seatId) as Seat | undefined;
   const employee = getEmployeeById(employeeId);
   if (!seat || !employee) return { ok: false, error: "not_found" };
 
-  const assignment = getSeatAssignment(seat, weekStart);
-  if (assignment.source === "fixed") {
-    return { ok: false, error: "not_found" };
+  const weeks = getFiveWeeks(weekStart);
+
+  // Check if it's a fixed seat
+  const inPool = db.prepare(`SELECT 1 FROM team_seats WHERE seat_id = ? LIMIT 1`).get(seatId);
+  if (!inPool) {
+    const isSeatCode = /^[A-Za-z]+\d+$/.test(seat.code) || /^[Ff]\d+-[A-Za-z]+\d+$/.test(seat.code);
+    if (!isSeatCode) {
+      return { ok: false, error: "not_found" };
+    }
   }
-  if (assignment.employee && assignment.employee.id !== employeeId) {
-    return { ok: false, error: "seat_taken" };
+
+  // Check if explicitly booked by someone else in any of the 5 weeks
+  const checkStmt = db.prepare(
+    `SELECT employee_id FROM bookings WHERE seat_id = ? AND week_start = ? AND status = 'booked'`
+  );
+  for (const w of weeks) {
+    const booked = checkStmt.get(seatId, w) as { employee_id: number } | undefined;
+    if (booked && booked.employee_id !== employeeId) {
+      return { ok: false, error: "seat_taken" };
+    }
   }
 
   try {
-    db.prepare(
-      `INSERT INTO bookings (seat_id, week_start, employee_id, status)
-       VALUES (?, ?, ?, 'booked')
-       ON CONFLICT(seat_id, week_start) DO UPDATE SET employee_id = excluded.employee_id, status = 'booked'`
-    ).run(seatId, weekStart, employeeId);
+    const runTx = db.transaction(() => {
+      const deleteStmt = db.prepare(
+        `DELETE FROM bookings WHERE employee_id = ? AND week_start = ? AND status = 'booked' AND seat_id != ?`
+      );
+      const insertStmt = db.prepare(
+        `INSERT INTO bookings (seat_id, week_start, employee_id, status)
+         VALUES (?, ?, ?, 'booked')
+         ON CONFLICT(seat_id, week_start) DO UPDATE SET employee_id = excluded.employee_id, status = 'booked'`
+      );
+
+      for (const w of weeks) {
+        deleteStmt.run(employeeId, w, seatId);
+        insertStmt.run(seatId, w, employeeId);
+      }
+    });
+
+    runTx();
     return { ok: true };
   } catch (err: any) {
     if (err.code === "SQLITE_CONSTRAINT_UNIQUE" && String(err.message).includes("employee_id")) {

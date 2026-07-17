@@ -77,23 +77,23 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap gap-5 text-sm font-semibold px-5 py-3.5 bg-[#0a1535]/80 rounded-2xl border border-blue-500/15 shadow-lg backdrop-blur-sm w-fit">
+      <div className="mb-6 flex flex-wrap gap-5 text-sm font-semibold px-5 py-3.5 bg-[#002836]/80 rounded-2xl border border-cyan-500/20 shadow-lg backdrop-blur-sm w-fit">
         <Legend swatch="bg-emerald-50 border-emerald-300" label="ว่าง จองได้" />
-        <Legend swatch="bg-blue-50 border-blue-200" label="หมุนเวียน (auto)" />
-        <Legend swatch="bg-gradient-to-br from-blue-500 to-blue-700 border-blue-600" label="จองเอง (booked)" />
+        <Legend swatch="bg-[#c1c8ab]/30 border-[#c1c8ab]" label="หมุนเวียน (auto)" />
+        <Legend swatch="bg-gradient-to-br from-[#44bbdb] to-[#04a4cc] border-[#04a4cc]" label="จองเอง (booked)" />
         <Legend swatch="bg-gradient-to-br from-amber-100 to-amber-200 border-amber-300" label="ที่นั่งประจำ (fixed)" />
-        {employeeId && <Legend swatch="ring-2 ring-blue-500 bg-white border-slate-200" label="ที่นั่งของฉัน" />}
+        {employeeId && <Legend swatch="ring-2 ring-[#ff8300] bg-white border-slate-200" label="ที่นั่งของฉัน" />}
       </div>
 
       <div className="overflow-x-auto pb-8">
         <div className="mx-auto w-fit">
           {floorName && (
-            <div className="mb-5 rounded-2xl bg-gradient-to-r from-[#101b45] via-[#1b2a6b] to-[#101b45] px-6 py-3.5 text-center text-xl font-extrabold tracking-[0.3em] text-white shadow-lg border border-blue-400/20 uppercase">
+            <div className="mb-5 rounded-2xl bg-gradient-to-r from-[#00222f] via-[#004a63] to-[#00222f] px-6 py-3.5 text-center text-xl font-extrabold tracking-[0.3em] text-white shadow-lg border border-cyan-400/25 uppercase">
               {floorName}
             </div>
           )}
         <div
-          className="inline-grid gap-3.5 p-10 rounded-[2rem] border border-slate-200/80 shadow-2xl bg-[radial-gradient(rgba(59,130,246,0.1)_1px,transparent_1px)] [background-size:20px_20px] bg-white"
+          className="inline-grid gap-3.5 p-10 rounded-[2rem] border border-slate-200/80 shadow-2xl bg-[radial-gradient(rgba(4,164,204,0.12)_1px,transparent_1px)] [background-size:20px_20px] bg-white"
           style={{
             gridTemplateRows: `repeat(${rowCount}, 5rem)`,
             gridTemplateColumns: `repeat(${colCount}, 7.5rem)`,
@@ -205,9 +205,9 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
             const isMine = employeeId != null && seat.employee?.id === employeeId;
             const base =
               seat.source === "booked"
-                ? "bg-gradient-to-br from-blue-500 to-blue-700 border-blue-600 text-white shadow-md hover:from-blue-600 hover:to-blue-800 hover:-translate-y-1 hover:shadow-blue-500/20"
+                ? "bg-gradient-to-br from-[#44bbdb] to-[#04a4cc] border-[#04a4cc] text-white shadow-md hover:from-[#44bbdb]/95 hover:to-[#04a4cc]/95 hover:-translate-y-1 hover:shadow-[#04a4cc]/20"
                 : seat.source === "auto"
-                ? "bg-blue-50 border-blue-200 text-blue-700 shadow-sm hover:bg-blue-100 hover:text-blue-900 hover:-translate-y-1"
+                ? "bg-[#c1c8ab]/30 border-[#c1c8ab] text-[#04a4cc] shadow-sm hover:bg-[#c1c8ab]/45 hover:-translate-y-1"
                 : "bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm hover:bg-emerald-100 hover:border-emerald-400 hover:-translate-y-1";
 
             const employeeName = seat.employee ? formatDisplayName(seat.employee.name) : "ว่าง";
@@ -219,13 +219,13 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
                 disabled={pending === seat.id}
                 style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
                 className={`flex h-full w-full flex-col items-center justify-center rounded-2xl border transition-all duration-300 px-2 text-center text-sm leading-tight ${base} ${
-                  isMine ? "ring-2 ring-sunset-500 shadow-lg shadow-sunset-500/30 z-10" : ""
+                  isMine ? "ring-2 ring-[#ff8300] shadow-lg shadow-[#ff8300]/40 z-10" : ""
                 } ${pending === seat.id ? "opacity-50 scale-95" : ""}`}
                 title={seat.code}
               >
                 <span className={`font-bold mb-1 text-base ${
                   seat.source === 'booked' ? 'text-white' :
-                  seat.source === 'auto' ? 'text-blue-700' :
+                  seat.source === 'auto' ? 'text-[#04a4cc]' :
                   'text-emerald-700'
                 }`}>{displayLabel}</span>
                 <span className={`truncate w-full font-medium ${
@@ -239,28 +239,28 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
       </div>
 
       {selected && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#03091e]/80 backdrop-blur-sm p-4 animate-fade-in-up" onClick={() => setSelected(null)}>
-          <div className="w-full max-w-sm rounded-2xl bg-[#081228] border border-blue-500/20 p-6 shadow-2xl transition-all" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#001722]/80 backdrop-blur-sm p-4 animate-fade-in-up" onClick={() => setSelected(null)}>
+          <div className="w-full max-w-sm rounded-2xl bg-[#00222f] border border-[#04a4cc]/25 p-6 shadow-2xl transition-all" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-start mb-2">
-              <h3 className="text-xl font-bold text-white">ที่นั่ง <span className="text-blue-300">{selected.code}</span></h3>
-              <button onClick={() => setSelected(null)} className="text-blue-400/60 hover:text-white p-1">✕</button>
+              <h3 className="text-xl font-bold text-white">ที่นั่ง <span className="text-[#44bbdb]">{selected.code}</span></h3>
+              <button onClick={() => setSelected(null)} className="text-cyan-200/60 hover:text-white p-1">✕</button>
             </div>
 
-            <div className="mb-6 rounded-lg bg-[#0d2060]/40 p-4 border border-blue-500/10">
+            <div className="mb-6 rounded-lg bg-[#002f40]/40 p-4 border border-[#04a4cc]/15">
               {selected.source === "fixed" ? (
-                <p className="font-medium text-amber-400 py-2 text-center text-lg">ที่นั่งประจำ (Fixed Seat)<br/><span className="text-sm font-normal mt-1 block text-blue-400/60">ไม่สามารถจองที่นั่งนี้ได้</span></p>
+                <p className="font-medium text-amber-400 py-2 text-center text-lg">ที่นั่งประจำ (Fixed Seat)<br/><span className="text-sm font-normal mt-1 block text-cyan-200/60">ไม่สามารถจองที่นั่งนี้ได้</span></p>
               ) : selected.employee ? (
                 <>
                   <p className="font-semibold text-white text-lg mb-1">{selected.employee.name}</p>
-                  <p className="text-sm text-blue-300/60 mb-2">ทีม: {selected.employee.team_name}</p>
+                  <p className="text-sm text-cyan-200/60 mb-2">ทีม: {selected.employee.team_name}</p>
                   <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                    selected.source === "booked" ? "bg-blue-500/20 text-blue-200 border border-blue-500/30" : "bg-[#0d2060]/60 text-blue-300 border border-blue-700/30"
+                    selected.source === "booked" ? "bg-[#04a4cc]/20 text-[#44bbdb] border border-[#04a4cc]/30" : "bg-[#c1c8ab]/20 text-[#c1c8ab] border border-[#c1c8ab]/30"
                   }`}>
                     {selected.source === "booked" ? "จองด้วยตัวเอง" : "ระบบหมุนเวียนอัตโนมัติ"}
                   </span>
                 </>
               ) : (
-                <p className="font-medium text-blue-400/60 py-2 text-center">ที่นั่งว่าง</p>
+                <p className="font-medium text-cyan-200/60 py-2 text-center">ที่นั่งว่าง</p>
               )}
             </div>
 
@@ -270,7 +270,7 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
               {employeeId && !selected.employee && selected.source !== "fixed" && (
                 <button
                   onClick={() => act(selected.id, "book")}
-                  className="rounded-xl bg-blue-600 px-4 py-2.5 font-semibold text-white shadow-md shadow-blue-950/40 transition-all hover:bg-blue-500 hover:shadow-lg focus:ring-4 focus:ring-blue-500/20"
+                  className="rounded-xl bg-[#04a4cc] px-4 py-2.5 font-semibold text-white shadow-md shadow-[#04a4cc]/30 transition-all hover:bg-[#44bbdb] hover:shadow-lg focus:ring-4 focus:ring-[#04a4cc]/20"
                 >
                   จองที่นั่งนี้
                 </button>
@@ -289,12 +289,12 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
               ) && (
                 <button
                   onClick={() => act(selected.id, "clear")}
-                  className="rounded-xl bg-[#0a1535] border border-blue-500/20 px-4 py-2.5 font-semibold text-blue-300 transition-all hover:bg-[#0d1e4a] focus:ring-4 focus:ring-blue-500/20"
+                  className="rounded-xl bg-[#00222f] border border-[#04a4cc]/25 px-4 py-2.5 font-semibold text-[#44bbdb] transition-all hover:bg-[#002f40] focus:ring-4 focus:ring-[#04a4cc]/20"
                 >
                   ยกเลิกการจอง/ปล่อย (กลับสู่ค่าอัตโนมัติ)
                 </button>
               )}
-              <button onClick={() => setSelected(null)} className="rounded-xl border border-blue-500/20 px-4 py-2.5 font-medium text-blue-400/60 transition-all hover:bg-[#0a1535] hover:text-blue-300">
+              <button onClick={() => setSelected(null)} className="rounded-xl border border-[#04a4cc]/25 px-4 py-2.5 font-medium text-[#44bbdb]/60 transition-all hover:bg-[#00222f] hover:text-[#44bbdb]">
                 ปิด
               </button>
             </div>
@@ -309,7 +309,7 @@ function Legend({ swatch, label }: { swatch: string; label: string }) {
   return (
     <div className="flex items-center gap-2">
       <span className={`inline-block h-4 w-4 rounded-md border ${swatch}`} />
-      <span className="text-blue-300/70">{label}</span>
+      <span className="text-cyan-200/70">{label}</span>
     </div>
   );
 }

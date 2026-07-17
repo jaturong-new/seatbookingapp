@@ -34,18 +34,21 @@ export default function FloorPage({
   return (
     <div>
       {/* Sticky control bar: week navigation + identity picker stay visible while scrolling the map */}
-      <div className="sticky top-16 z-40 -mx-6 mb-8 border-b border-blue-500/10 bg-[#03091e]/80 px-6 py-3.5 shadow-lg backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[98vw] flex-wrap items-center justify-between gap-4">
-          <h1 className="text-2xl font-extrabold tracking-tight text-white whitespace-nowrap">
+      <div className="sticky top-16 z-40 -mx-6 mb-4 border-b border-[#04a4cc]/15 bg-[#002330]/85 px-6 py-3 shadow-lg backdrop-blur-xl">
+        <div className="mx-auto flex max-w-[98vw] flex-wrap items-center justify-between gap-3">
+          <h1 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2 whitespace-nowrap">
             ผังที่นั่ง{" "}
-            <span className="bg-gradient-to-r from-blue-300 to-blue-500 bg-clip-text text-transparent">{floor.name}</span>
+            <span className="bg-gradient-to-r from-[#44bbdb] to-[#04a4cc] bg-clip-text text-transparent">{floor.name}</span>
+            <span className="text-xs font-normal text-cyan-200/60 hidden xl:inline">| จัดการและเลือกที่นั่งประจำสัปดาห์</span>
           </h1>
-          <WeekNav basePath={`/floor/${floor.code}`} weekStart={weekStart} />
-          <PersonPicker />
+          <div className="flex flex-wrap items-center gap-3">
+            <WeekNav basePath={`/floor/${floor.code}`} weekStart={weekStart} />
+            <PersonPicker />
+          </div>
         </div>
       </div>
 
-      <div className="rounded-[2.5rem] border border-blue-500/15 bg-[#0a1535]/80 p-6 shadow-2xl backdrop-blur-md md:p-10">
+      <div className="bg-[#002836]/80 backdrop-blur-md rounded-[1.5rem] p-4 md:p-6 shadow-2xl border border-[#04a4cc]/20">
         <FloorMap seats={seats} weekStart={weekStart} floorName={`Floor ${floor.code.replace(/^F/i, "")}`} />
       </div>
     </div>
