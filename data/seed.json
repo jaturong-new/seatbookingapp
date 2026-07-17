@@ -528,7 +528,7 @@
       "floor_code": "F32",
       "row_letter": "Fixed",
       "col_number": 2,
-      "code": "ณัฐฐินี ก้อนแหวน",
+      "code": "F32-E4",
       "full_code": "F32-FIXEDDEV-2",
       "grid_row": 15,
       "grid_col": 11
@@ -537,7 +537,7 @@
       "floor_code": "F32",
       "row_letter": "Fixed",
       "col_number": 3,
-      "code": "เจนภพ สิทธิโชติ",
+      "code": "สหัสวรรษ หิรัญเพชร",
       "full_code": "F32-FIXEDDEV-3",
       "grid_row": 15,
       "grid_col": 12
@@ -582,7 +582,7 @@
       "floor_code": "F32",
       "row_letter": "Fixed",
       "col_number": 5,
-      "code": "ยศวัจน์ หาญเจริญวงศ์",
+      "code": "อาภัสรา โมรัษเฐียร",
       "full_code": "F32-FIXEDDEV-5",
       "grid_row": 16,
       "grid_col": 12
@@ -591,7 +591,7 @@
       "floor_code": "F32",
       "row_letter": "Fixed",
       "col_number": 6,
-      "code": "สุวิษา สอนแก้ว",
+      "code": "กัญญาภัค ประสมศรี",
       "full_code": "F32-FIXEDDEV-6",
       "grid_row": 16,
       "grid_col": 13
