@@ -15,7 +15,7 @@ type SeedData = {
     grid_col: number;
   }[];
   teams: { name: string }[];
-  employees: { name: string; team_name: string }[];
+  employees: { name: string; team_name: string; group_number?: number }[];
   team_seats: { team_name: string; seat_full_code: string; pool_order: number }[];
   initial_assignment: { seat_full_code: string; employee_name: string; team_name: string }[];
 };
@@ -84,7 +84,7 @@ function main() {
       if (!tId) continue;
       const idx = teamRosterIndex.get(e.team_name) ?? 0;
       teamRosterIndex.set(e.team_name, idx + 1);
-      const groupNumber = (idx % 4) + 1;
+      const groupNumber = e.group_number ?? ((idx % 6) + 1);
       const info = insEmployee.run(e.name, tId, groupNumber);
       employeeId.set(`${e.team_name}:${e.name}`, info.lastInsertRowid as number);
     }

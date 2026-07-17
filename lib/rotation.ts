@@ -38,8 +38,8 @@ export function getSeedWeekStart(): string {
 export function wfhGroupForWeek(weekStart: string): number {
   const seedWeek = getSeedWeekStart();
   const offset = weekOffset(seedWeek, weekStart);
-  const cyclePos = ((offset % 4) + 4) % 4;
-  return ((cyclePos + 3) % 4) + 1;
+  const cyclePos = ((offset % 6) + 6) % 6;
+  return ((cyclePos + 5) % 6) + 1;
 }
 
 export function isGroupWfh(groupNumber: number, weekStart: string): boolean {
@@ -83,9 +83,7 @@ export function computeAutoSeat(
   const pool = getTeamPool(employee.team_id);
   if (pool.length === 0) return null;
 
-  const seedWeek = getSeedWeekStart();
-  const offset = weekOffset(seedWeek, weekStart);
-  const index = ((rotation.initial_pool_index + offset) % pool.length + pool.length) % pool.length;
+  const index = (rotation.initial_pool_index % pool.length + pool.length) % pool.length;
   const seat = pool[index];
   return { seatId: seat.seatId, fullCode: seat.fullCode };
 }

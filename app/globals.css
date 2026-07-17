@@ -20,11 +20,10 @@
 }
 
 body {
-  background-color: #03091e;
-  background-image:
-    radial-gradient(ellipse at 35% 0%, #0d2255 0%, #07143a 35%, #03091e 80%);
+  background-color: #04a4cc;
+  background-image: linear-gradient(135deg, #44bbdb 0%, #04a4cc 100%);
   background-attachment: fixed;
-  color: #e2e8f0;
+  color: #ffffff;
 }
 
 ::-webkit-scrollbar {
@@ -32,12 +31,12 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #03091e;
+  background: #04a4cc;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1a3880;
+  background: #44bbdb;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2a55b5;
+  background: #ffffff;
 }

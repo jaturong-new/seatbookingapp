@@ -29,16 +29,16 @@ export default function PersonPicker() {
   }, []);
 
   return (
-    <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-white/70 backdrop-blur px-4 py-2.5 shadow-sm transition-all focus-within:ring-2 focus-within:ring-ocean-500 focus-within:border-transparent">
-      <label className="text-sm font-medium text-slate-500 flex items-center gap-1.5" htmlFor="person-picker">
-        <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/70 backdrop-blur px-3 py-1.5 shadow-sm transition-all focus-within:ring-2 focus-within:ring-ocean-500 focus-within:border-transparent">
+      <label className="text-xs font-semibold text-slate-500 flex items-center gap-1" htmlFor="person-picker">
+        <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
         ระบุตัวตน:
       </label>
       <select
         id="person-picker"
-        className="bg-transparent text-sm font-semibold text-ocean-900 outline-none cursor-pointer pr-4"
+        className="bg-transparent text-xs font-bold text-ocean-900 outline-none cursor-pointer pr-2"
         value={employeeId ?? ""}
         onChange={(e) => setStoredEmployeeId(e.target.value ? Number(e.target.value) : null)}
       >

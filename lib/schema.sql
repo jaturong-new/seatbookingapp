@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS employees (
   name TEXT NOT NULL,
   team_id INTEGER NOT NULL REFERENCES teams(id),
   active INTEGER NOT NULL DEFAULT 1,
-  group_number INTEGER NOT NULL CHECK (group_number BETWEEN 1 AND 4)
+  group_number INTEGER NOT NULL CHECK (group_number BETWEEN 1 AND 6)
 );
 
 CREATE TABLE IF NOT EXISTS team_seats (
