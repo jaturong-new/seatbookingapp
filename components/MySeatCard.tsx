@@ -23,12 +23,18 @@ export default function MySeatCard({ weekStart }: { weekStart: string }) {
     }
     setLoading(true);
     fetch(`/api/my-seat?employeeId=${employeeId}&week=${weekStart}`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) {
+          throw new Error("Failed to fetch");
+        }
+        return r.json();
+      })
       .then(setData)
+      .catch(() => setData({ error: "not_found" } as any))
       .finally(() => setLoading(false));
   }, [employeeId, weekStart]);
 
-  if (!employeeId) {
+  if (!employeeId || (data && "error" in data)) {
     return (
       <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-sm font-medium text-slate-500">
         👆 โปรดเลือกชื่อของคุณด้านบน เพื่อดูสถานะที่นั่งในสัปดาห์นี้

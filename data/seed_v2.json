@@ -1,0 +1,837 @@
+{
+  "seed_week_start": "2025-09-29",
+  "floors": [
+    {
+      "code": "F24",
+      "name": "ชั้น 24"
+    },
+    {
+      "code": "F32",
+      "name": "ชั้น 32"
+    },
+    {
+      "code": "F5",
+      "name": "ชั้น 5"
+    }
+  ],
+  "seats": [
+    {
+      "floor_code": "F32",
+      "row_letter": "A",
+      "col_number": 2,
+      "code": "A2",
+      "full_code": "F32-A2",
+      "grid_row": 6,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "A",
+      "col_number": 3,
+      "code": "A3",
+      "full_code": "F32-A3",
+      "grid_row": 6,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "B",
+      "col_number": 1,
+      "code": "B1",
+      "full_code": "F32-B1",
+      "grid_row": 7,
+      "grid_col": 9
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "C",
+      "col_number": 1,
+      "code": "C1",
+      "full_code": "F32-C1",
+      "grid_row": 10,
+      "grid_col": 9
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "C",
+      "col_number": 2,
+      "code": "C2",
+      "full_code": "F32-C2",
+      "grid_row": 10,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "C",
+      "col_number": 3,
+      "code": "C3",
+      "full_code": "F32-C3",
+      "grid_row": 10,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "E",
+      "col_number": 2,
+      "code": "E2",
+      "full_code": "F32-E2",
+      "grid_row": 14,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "E",
+      "col_number": 3,
+      "code": "E3",
+      "full_code": "F32-E3",
+      "grid_row": 14,
+      "grid_col": 9
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "F",
+      "col_number": 3,
+      "code": "F3",
+      "full_code": "F32-F3",
+      "grid_row": 15,
+      "grid_col": 9
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "L",
+      "col_number": 1,
+      "code": "L1",
+      "full_code": "F32-L1",
+      "grid_row": 27,
+      "grid_col": 7
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "L",
+      "col_number": 2,
+      "code": "L2",
+      "full_code": "F32-L2",
+      "grid_row": 27,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F24",
+      "row_letter": "G",
+      "col_number": 2,
+      "code": "G2",
+      "full_code": "F24-G2",
+      "grid_row": 68,
+      "grid_col": 3
+    },
+    {
+      "floor_code": "F24",
+      "row_letter": "G",
+      "col_number": 3,
+      "code": "G3",
+      "full_code": "F24-G3",
+      "grid_row": 68,
+      "grid_col": 4
+    },
+    {
+      "floor_code": "F24",
+      "row_letter": "H",
+      "col_number": 2,
+      "code": "H2",
+      "full_code": "F24-H2",
+      "grid_row": 69,
+      "grid_col": 3
+    },
+    {
+      "floor_code": "F24",
+      "row_letter": "H",
+      "col_number": 3,
+      "code": "H3",
+      "full_code": "F24-H3",
+      "grid_row": 69,
+      "grid_col": 4
+    },
+    {
+      "floor_code": "F24",
+      "row_letter": "H",
+      "col_number": 4,
+      "code": "H4",
+      "full_code": "F24-H4",
+      "grid_row": 69,
+      "grid_col": 5
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "A",
+      "col_number": 2,
+      "code": "A2",
+      "full_code": "F5-A2",
+      "grid_row": 85,
+      "grid_col": 3
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "A",
+      "col_number": 3,
+      "code": "A3",
+      "full_code": "F5-A3",
+      "grid_row": 85,
+      "grid_col": 4
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "B",
+      "col_number": 2,
+      "code": "B2",
+      "full_code": "F5-B2",
+      "grid_row": 87,
+      "grid_col": 3
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "B",
+      "col_number": 3,
+      "code": "B3",
+      "full_code": "F5-B3",
+      "grid_row": 87,
+      "grid_col": 4
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "C",
+      "col_number": 2,
+      "code": "C2",
+      "full_code": "F5-C2",
+      "grid_row": 88,
+      "grid_col": 1
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "C",
+      "col_number": 3,
+      "code": "C3",
+      "full_code": "F5-C3",
+      "grid_row": 88,
+      "grid_col": 2
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "C",
+      "col_number": 4,
+      "code": "C4",
+      "full_code": "F5-C4",
+      "grid_row": 88,
+      "grid_col": 3
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "C",
+      "col_number": 5,
+      "code": "C5",
+      "full_code": "F5-C5",
+      "grid_row": 88,
+      "grid_col": 4
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "C",
+      "col_number": 6,
+      "code": "C6",
+      "full_code": "F5-C6",
+      "grid_row": 88,
+      "grid_col": 5
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "D",
+      "col_number": 2,
+      "code": "D2",
+      "full_code": "F5-D2",
+      "grid_row": 92,
+      "grid_col": 1
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "D",
+      "col_number": 3,
+      "code": "D3",
+      "full_code": "F5-D3",
+      "grid_row": 92,
+      "grid_col": 2
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "E",
+      "col_number": 2,
+      "code": "E2",
+      "full_code": "F5-E2",
+      "grid_row": 93,
+      "grid_col": 1
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "E",
+      "col_number": 3,
+      "code": "E3",
+      "full_code": "F5-E3",
+      "grid_row": 93,
+      "grid_col": 2
+    }
+  ],
+  "teams": [
+    {
+      "name": "DEV"
+    }
+  ],
+  "employees": [
+    {
+      "name": "วรัชยานันทน์ พิภัชสิทธา",
+      "team_name": "DEV"
+    },
+    {
+      "name": "สาธิต นวหิรัญกุล",
+      "team_name": "DEV"
+    },
+    {
+      "name": "อรพิมพ์ สระกระโทก",
+      "team_name": "DEV"
+    },
+    {
+      "name": "เอกรินทร์ แรงสูงเนิน",
+      "team_name": "DEV"
+    },
+    {
+      "name": "กนกพร สุขปัญญา",
+      "team_name": "DEV"
+    },
+    {
+      "name": "สุทรรศนีย์ ห่วงไธสงค์",
+      "team_name": "DEV"
+    },
+    {
+      "name": "ปรียนุช ใจชื้น",
+      "team_name": "DEV"
+    },
+    {
+      "name": "กฤตกร ทิมะวงศ์",
+      "team_name": "DEV"
+    },
+    {
+      "name": "เยาวเรศ นิ่มเนตร",
+      "team_name": "DEV"
+    },
+    {
+      "name": "ดรุฑ จงบรรเจิดเพชร",
+      "team_name": "DEV"
+    },
+    {
+      "name": "พีรพัฒน์ กิจพร้อมผล",
+      "team_name": "DEV"
+    },
+    {
+      "name": "สุรเชฐ จินทนา",
+      "team_name": "DEV"
+    },
+    {
+      "name": "ศรัณยู คำแสง",
+      "team_name": "DEV"
+    },
+    {
+      "name": "อาภัสรา โมรัษเฐียร",
+      "team_name": "DEV"
+    },
+    {
+      "name": "รัชชานนท์ บุญจำรูญ",
+      "team_name": "DEV"
+    },
+    {
+      "name": "สหัสวรรษ หิรัญเพชร",
+      "team_name": "DEV"
+    },
+    {
+      "name": "รุจรวี มีลา",
+      "team_name": "DEV"
+    },
+    {
+      "name": "ปุณยา หาสินอนันต์",
+      "team_name": "DEV"
+    },
+    {
+      "name": "พรณัฐา ใจประเสริฐ",
+      "team_name": "DEV"
+    },
+    {
+      "name": "ธนากร เหรียญรุ่งเรือง",
+      "team_name": "DEV"
+    },
+    {
+      "name": "พิธภัณฑ์ ศรีวะรมย์",
+      "team_name": "DEV"
+    },
+    {
+      "name": "คมชาญ จันทร์นาค",
+      "team_name": "DEV"
+    },
+    {
+      "name": "กัญญาภัค ประสมศรี",
+      "team_name": "DEV"
+    },
+    {
+      "name": "ศิริภัทร ตุลยกุล",
+      "team_name": "DEV"
+    },
+    {
+      "name": "คามิน ด่านคอนสกุล",
+      "team_name": "DEV"
+    },
+    {
+      "name": "ธีระเดช ทวีบุญรุ่งเรื่อง",
+      "team_name": "DEV"
+    },
+    {
+      "name": "ปิยะ แก้วเกษ",
+      "team_name": "DEV"
+    },
+    {
+      "name": "ภาณุพันธ์ สุขดี",
+      "team_name": "DEV"
+    },
+    {
+      "name": "สถาพร ประณิธานวิทยา",
+      "team_name": "DEV"
+    },
+    {
+      "name": "สุวิษา สอนแก้ว",
+      "team_name": "DEV"
+    },
+    {
+      "name": "ยศวัจน์ หาญเจริญวงศ์",
+      "team_name": "DEV"
+    },
+    {
+      "name": "เจนภพ สิทธิโชติ",
+      "team_name": "DEV"
+    },
+    {
+      "name": "จาตุรงค์ ทองแดง",
+      "team_name": "DEV"
+    },
+    {
+      "name": "โอภาส ตรีนัย",
+      "team_name": "DEV"
+    },
+    {
+      "name": "มาโนชญ์ สุวรรณดี",
+      "team_name": "DEV"
+    },
+    {
+      "name": "ภูวสิษฏ์ ผลรุ่งเจริญวงษ์",
+      "team_name": "DEV"
+    },
+    {
+      "name": "บดินทร์ รินเย็น",
+      "team_name": "DEV"
+    },
+    {
+      "name": "ศุภกิจ สิงห์เวียง",
+      "team_name": "DEV"
+    },
+    {
+      "name": "พงศ์ธยศ ไวยวุธ",
+      "team_name": "DEV"
+    },
+    {
+      "name": "พีชนก ชูสมบัติ",
+      "team_name": "DEV"
+    },
+    {
+      "name": "วราทร เอมบำรุง",
+      "team_name": "DEV"
+    },
+    {
+      "name": "ณัฐฐินี ก้อนแหวน",
+      "team_name": "DEV"
+    },
+    {
+      "name": "วสันต์ เพียรมาก",
+      "team_name": "DEV"
+    },
+    {
+      "name": "ชนกนันท์ นุ่มน้อย",
+      "team_name": "DEV"
+    }
+  ],
+  "team_seats": [
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F5-A2",
+      "pool_order": 0
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F5-A3",
+      "pool_order": 1
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F5-B2",
+      "pool_order": 2
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F5-B3",
+      "pool_order": 3
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F5-C2",
+      "pool_order": 4
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F5-C3",
+      "pool_order": 5
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F5-C4",
+      "pool_order": 6
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F5-C5",
+      "pool_order": 7
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F5-C6",
+      "pool_order": 8
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F5-D2",
+      "pool_order": 9
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F5-D3",
+      "pool_order": 10
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F5-E2",
+      "pool_order": 11
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F5-E3",
+      "pool_order": 12
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F24-G2",
+      "pool_order": 13
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F24-G3",
+      "pool_order": 14
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F24-H2",
+      "pool_order": 15
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F24-H3",
+      "pool_order": 16
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F24-H4",
+      "pool_order": 17
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F32-A2",
+      "pool_order": 18
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F32-A3",
+      "pool_order": 19
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F32-B1",
+      "pool_order": 20
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F32-C3",
+      "pool_order": 21
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F32-C2",
+      "pool_order": 22
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F32-C1",
+      "pool_order": 23
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F32-E2",
+      "pool_order": 24
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F32-E3",
+      "pool_order": 25
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F32-E4",
+      "pool_order": 26
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F32-F3",
+      "pool_order": 27
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F32-L1",
+      "pool_order": 28
+    },
+    {
+      "team_name": "DEV",
+      "seat_full_code": "F32-L2",
+      "pool_order": 29
+    }
+  ],
+  "initial_assignment": [
+    {
+      "seat_full_code": "F5-A2",
+      "employee_name": "สุวิษา สอนแก้ว",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-A3",
+      "employee_name": "ยศวัจน์ หาญเจริญวงศ์",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-B2",
+      "employee_name": "เจนภพ สิทธิโชติ",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-B3",
+      "employee_name": "จาตุรงค์ ทองแดง",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-C2",
+      "employee_name": "โอภาส ตรีนัย",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-C3",
+      "employee_name": "มาโนชญ์ สุวรรณดี",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-C4",
+      "employee_name": "ภูวสิษฏ์ ผลรุ่งเจริญวงษ์",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-C5",
+      "employee_name": "บดินทร์ รินเย็น",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-C6",
+      "employee_name": "ศุภกิจ สิงห์เวียง",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-D2",
+      "employee_name": "พงศ์ธยศ ไวยวุธ",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-D3",
+      "employee_name": "ปิยะ แก้วเกษ",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-E2",
+      "employee_name": "ภาณุพันธ์ สุขดี",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-E3",
+      "employee_name": "สถาพร ประณิธานวิทยา",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F24-G2",
+      "employee_name": "วรัชยานันทน์ พิภัชสิทธา",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F24-G3",
+      "employee_name": "สาธิต นวหิรัญกุล",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F24-H2",
+      "employee_name": "อรพิมพ์ สระกระโทก",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F24-H3",
+      "employee_name": "เอกรินทร์ แรงสูงเนิน",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F24-H4",
+      "employee_name": "กนกพร สุขปัญญา",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F32-A2",
+      "employee_name": "สุทรรศนีย์ ห่วงไธสงค์",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F32-A3",
+      "employee_name": "ปรียนุช ใจชื้น",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F32-B1",
+      "employee_name": "กฤตกร ทิมะวงศ์",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F32-C3",
+      "employee_name": "พีรพัฒน์ กิจพร้อมผล",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F32-C2",
+      "employee_name": "ดรุฑ จงบรรเจิดเพชร",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F32-C1",
+      "employee_name": "เยาวเรศ นิ่มเนตร",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F32-C1",
+      "employee_name": "สุรเชฐ จินทนา",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F32-E2",
+      "employee_name": "ศรัณยู คำแสง",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F32-E3",
+      "employee_name": "อาภัสรา โมรัษเฐียร",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F32-E4",
+      "employee_name": "รัชชานนท์ บุญจำรูญ",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F32-F3",
+      "employee_name": "สหัสวรรษ หิรัญเพชร",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F32-L2",
+      "employee_name": "รุจรวี มีลา",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-A2",
+      "employee_name": "ปุณยา หาสินอนันต์",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-A3",
+      "employee_name": "พรณัฐา ใจประเสริฐ",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-B2",
+      "employee_name": "ธนากร เหรียญรุ่งเรือง",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-B3",
+      "employee_name": "พิธภัณฑ์ ศรีวะรมย์",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-C2",
+      "employee_name": "คมชาญ จันทร์นาค",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-C3",
+      "employee_name": "กัญญาภัค ประสมศรี",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-C4",
+      "employee_name": "ศิริภัทร ตุลยกุล",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-C5",
+      "employee_name": "คามิน ด่านคอนสกุล",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-C6",
+      "employee_name": "ธีระเดช ทวีบุญรุ่งเรื่อง",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-D2",
+      "employee_name": "ณัฐฐินี ก้อนแหวน",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-D3",
+      "employee_name": "วสันต์ เพียรมาก",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-E2",
+      "employee_name": "ชนกนันท์ นุ่มน้อย",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-E3",
+      "employee_name": "วราทร เอมบำรุง",
+      "team_name": "DEV"
+    },
+    {
+      "seat_full_code": "F5-D3",
+      "employee_name": "พีชนก ชูสมบัติ",
+      "team_name": "DEV"
+    }
+  ]
+}
