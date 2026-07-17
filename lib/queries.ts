@@ -307,10 +307,14 @@ export function setEmployeeActive(employeeId: number, active: boolean): void {
   getDb().prepare(`UPDATE employees SET active = ? WHERE id = ?`).run(active ? 1 : 0, employeeId);
 }
 
+/** Employees manageable from admin: excludes fixed-seat leads (their seat is permanent, not part of the active/inactive rotation toggle). */
 export function getAllEmployeesIncludingInactive(): (Employee & { team_name: string })[] {
   return getDb()
     .prepare(
-      `SELECT e.*, t.name as team_name FROM employees e JOIN teams t ON t.id = e.team_id ORDER BY t.name, e.name`
+      `SELECT e.*, t.name as team_name FROM employees e
+       JOIN teams t ON t.id = e.team_id
+       WHERE NOT EXISTS (SELECT 1 FROM seats s WHERE s.code = e.name)
+       ORDER BY e.active DESC, t.name, e.name`
     )
     .all() as (Employee & { team_name: string })[];
 }
