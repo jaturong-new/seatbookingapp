@@ -4,6 +4,10 @@
     {
       "code": "F5",
       "name": "ชั้น 5"
+    },
+    {
+      "code": "F32",
+      "name": "ชั้น 32"
     }
   ],
   "seats": [
@@ -339,6 +343,798 @@
       "full_code": "F5-DOOR-1",
       "grid_row": 84,
       "grid_col": 6
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Locker",
+      "col_number": 1,
+      "code": "H Locker 4",
+      "full_code": "F32-LOCKER-1",
+      "grid_row": 5,
+      "grid_col": 5
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Locker",
+      "col_number": 2,
+      "code": "I Locker 3",
+      "full_code": "F32-LOCKER-2",
+      "grid_row": 5,
+      "grid_col": 6
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Locker",
+      "col_number": 3,
+      "code": "G Locker 5",
+      "full_code": "F32-LOCKER-3",
+      "grid_row": 7,
+      "grid_col": 5
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 1,
+      "code": "เฉลิมพงษ์ (ปุ๊)",
+      "full_code": "F32-FIXEDNAME-1",
+      "grid_row": 7,
+      "grid_col": 7
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "A",
+      "col_number": 1,
+      "code": "F32-A1",
+      "full_code": "F32-A1",
+      "grid_row": 7,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "A",
+      "col_number": 2,
+      "code": "F32-A2",
+      "full_code": "F32-A2",
+      "grid_row": 7,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "A",
+      "col_number": 3,
+      "code": "F32-A3",
+      "full_code": "F32-A3",
+      "grid_row": 7,
+      "grid_col": 12
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "A",
+      "col_number": 4,
+      "code": "F32-A4",
+      "full_code": "F32-A4",
+      "grid_row": 7,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Locker",
+      "col_number": 4,
+      "code": "F Locker 2",
+      "full_code": "F32-LOCKER-4",
+      "grid_row": 8,
+      "grid_col": 5
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Ext",
+      "col_number": 1,
+      "code": "Ext. 1777",
+      "full_code": "F32-EXT-1",
+      "grid_row": 8,
+      "grid_col": 7
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Intern",
+      "col_number": 1,
+      "code": "นักศึกษาฝึกงาน",
+      "full_code": "F32-INTERN-1",
+      "grid_row": 8,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Intern",
+      "col_number": 2,
+      "code": "นักศึกษาฝึกงาน",
+      "full_code": "F32-INTERN-2",
+      "grid_row": 8,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "C",
+      "col_number": 1,
+      "code": "F32-C1",
+      "full_code": "F32-C1",
+      "grid_row": 11,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "C",
+      "col_number": 2,
+      "code": "F32-C2",
+      "full_code": "F32-C2",
+      "grid_row": 11,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "C",
+      "col_number": 3,
+      "code": "F32-C3",
+      "full_code": "F32-C3",
+      "grid_row": 11,
+      "grid_col": 12
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "C",
+      "col_number": 4,
+      "code": "F32-C4",
+      "full_code": "F32-C4",
+      "grid_row": 11,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Locker",
+      "col_number": 5,
+      "code": "E Locker 1",
+      "full_code": "F32-LOCKER-5",
+      "grid_row": 12,
+      "grid_col": 9
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Locker",
+      "col_number": 6,
+      "code": "J Locker 6",
+      "full_code": "F32-LOCKER-6",
+      "grid_row": 14,
+      "grid_col": 4
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "E",
+      "col_number": 2,
+      "code": "F32-E2",
+      "full_code": "F32-E2",
+      "grid_row": 15,
+      "grid_col": 9
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "E",
+      "col_number": 3,
+      "code": "F32-E3",
+      "full_code": "F32-E3",
+      "grid_row": 15,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 2,
+      "code": "ณัฐฐินี ก้อนแหวน",
+      "full_code": "F32-FIXEDDEV-2",
+      "grid_row": 15,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 3,
+      "code": "เจนภพ สิทธิโชติ",
+      "full_code": "F32-FIXEDDEV-3",
+      "grid_row": 15,
+      "grid_col": 12
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 4,
+      "code": "ธนาวุฒิ ประเสริฐสังข์",
+      "full_code": "F32-FIXEDNAME-4",
+      "grid_row": 15,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "F",
+      "col_number": 2,
+      "code": "F32-F2",
+      "full_code": "F32-F2",
+      "grid_row": 16,
+      "grid_col": 9
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "F",
+      "col_number": 3,
+      "code": "F32-F3",
+      "full_code": "F32-F3",
+      "grid_row": 16,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "F",
+      "col_number": 4,
+      "code": "F32-F4",
+      "full_code": "F32-F4",
+      "grid_row": 16,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 5,
+      "code": "ยศวัจน์ หาญเจริญวงศ์",
+      "full_code": "F32-FIXEDDEV-5",
+      "grid_row": 16,
+      "grid_col": 12
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 6,
+      "code": "สุวิษา สอนแก้ว",
+      "full_code": "F32-FIXEDDEV-6",
+      "grid_row": 16,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "G",
+      "col_number": 1,
+      "code": "F32-G1",
+      "full_code": "F32-G1",
+      "grid_row": 19,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "G",
+      "col_number": 2,
+      "code": "F32-G2",
+      "full_code": "F32-G2",
+      "grid_row": 19,
+      "grid_col": 9
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "G",
+      "col_number": 3,
+      "code": "F32-G3",
+      "full_code": "F32-G3",
+      "grid_row": 19,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 7,
+      "code": "สมหญิง (หญิง)",
+      "full_code": "F32-FIXEDNAME-7",
+      "grid_row": 19,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 8,
+      "code": "นุสรา (นก)",
+      "full_code": "F32-FIXEDNAME-8",
+      "grid_row": 19,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "H",
+      "col_number": 1,
+      "code": "F32-H1",
+      "full_code": "F32-H1",
+      "grid_row": 20,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "H",
+      "col_number": 2,
+      "code": "F32-H2",
+      "full_code": "F32-H2",
+      "grid_row": 20,
+      "grid_col": 9
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "H",
+      "col_number": 3,
+      "code": "F32-H3",
+      "full_code": "F32-H3",
+      "grid_row": 20,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 9,
+      "code": "ศศินันท์ (นก)",
+      "full_code": "F32-FIXEDNAME-9",
+      "grid_row": 20,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Bar",
+      "col_number": 1,
+      "code": "Bar1",
+      "full_code": "F32-BAR-1",
+      "grid_row": 24,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Bar",
+      "col_number": 2,
+      "code": "Bar2",
+      "full_code": "F32-BAR-2",
+      "grid_row": 24,
+      "grid_col": 9
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Bar",
+      "col_number": 3,
+      "code": "Bar3",
+      "full_code": "F32-BAR-3",
+      "grid_row": 24,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Bar",
+      "col_number": 4,
+      "code": "Bar4",
+      "full_code": "F32-BAR-4",
+      "grid_row": 24,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 10,
+      "code": "SA : ณภัค (ทราย)",
+      "full_code": "F32-FIXEDNAME-10",
+      "grid_row": 27,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 11,
+      "code": "SA : ภัทร์ปรียา (แอนนี่)",
+      "full_code": "F32-FIXEDNAME-11",
+      "grid_row": 27,
+      "grid_col": 9
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "K",
+      "col_number": 3,
+      "code": "F32-K3",
+      "full_code": "F32-K3",
+      "grid_row": 27,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "K",
+      "col_number": 4,
+      "code": "F32-K4",
+      "full_code": "F32-K4",
+      "grid_row": 27,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "K",
+      "col_number": 5,
+      "code": "F32-K5",
+      "full_code": "F32-K5",
+      "grid_row": 27,
+      "grid_col": 12
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 12,
+      "code": "SA : พงศ์ธิป (พง)",
+      "full_code": "F32-FIXEDNAME-12",
+      "grid_row": 27,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 13,
+      "code": "SA : สิริรัตน์ (ตุ้ม)",
+      "full_code": "F32-FIXEDNAME-13",
+      "grid_row": 28,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "L",
+      "col_number": 2,
+      "code": "F32-L2",
+      "full_code": "F32-L2",
+      "grid_row": 28,
+      "grid_col": 9
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "L",
+      "col_number": 3,
+      "code": "F32-L3",
+      "full_code": "F32-L3",
+      "grid_row": 28,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "L",
+      "col_number": 4,
+      "code": "F32-L4",
+      "full_code": "F32-L4",
+      "grid_row": 28,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "L",
+      "col_number": 5,
+      "code": "F32-L5",
+      "full_code": "F32-L5",
+      "grid_row": 28,
+      "grid_col": 12
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 14,
+      "code": "SA : ชุติมา (อั๋น)",
+      "full_code": "F32-FIXEDNAME-14",
+      "grid_row": 28,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Door",
+      "col_number": 1,
+      "code": "ประตู",
+      "full_code": "F32-DOOR-1",
+      "grid_row": 29,
+      "grid_col": 6
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "M",
+      "col_number": 1,
+      "code": "F32-M1",
+      "full_code": "F32-M1",
+      "grid_row": 31,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "M",
+      "col_number": 2,
+      "code": "F32-M2",
+      "full_code": "F32-M2",
+      "grid_row": 31,
+      "grid_col": 9
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "M",
+      "col_number": 3,
+      "code": "F32-M3",
+      "full_code": "F32-M3",
+      "grid_row": 31,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "M",
+      "col_number": 4,
+      "code": "F32-M4",
+      "full_code": "F32-M4",
+      "grid_row": 31,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "M",
+      "col_number": 5,
+      "code": "F32-M5",
+      "full_code": "F32-M5",
+      "grid_row": 31,
+      "grid_col": 12
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 15,
+      "code": "วรพงศ์ (พงศ์)",
+      "full_code": "F32-FIXEDNAME-15",
+      "grid_row": 31,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "N",
+      "col_number": 1,
+      "code": "F32-N1",
+      "full_code": "F32-N1",
+      "grid_row": 32,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "N",
+      "col_number": 2,
+      "code": "F32-N2",
+      "full_code": "F32-N2",
+      "grid_row": 32,
+      "grid_col": 9
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "N",
+      "col_number": 3,
+      "code": "F32-N3",
+      "full_code": "F32-N3",
+      "grid_row": 32,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "N",
+      "col_number": 4,
+      "code": "F32-N4",
+      "full_code": "F32-N4",
+      "grid_row": 32,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "N",
+      "col_number": 5,
+      "code": "F32-N5",
+      "full_code": "F32-N5",
+      "grid_row": 32,
+      "grid_col": 12
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "N",
+      "col_number": 6,
+      "code": "F32-N6",
+      "full_code": "F32-N6",
+      "grid_row": 32,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Locker",
+      "col_number": 7,
+      "code": "C Locker 10",
+      "full_code": "F32-LOCKER-7",
+      "grid_row": 35,
+      "grid_col": 7
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Locker",
+      "col_number": 8,
+      "code": "D Locker 9",
+      "full_code": "F32-LOCKER-8",
+      "grid_row": 35,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 16,
+      "code": "วโรฒน์ (แบงค์)",
+      "full_code": "F32-FIXEDNAME-16",
+      "grid_row": 35,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "O",
+      "col_number": 1,
+      "code": "F32-O1",
+      "full_code": "F32-O1",
+      "grid_row": 36,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "O",
+      "col_number": 2,
+      "code": "F32-O2",
+      "full_code": "F32-O2",
+      "grid_row": 36,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Locker",
+      "col_number": 9,
+      "code": "B Locker 8",
+      "full_code": "F32-LOCKER-9",
+      "grid_row": 37,
+      "grid_col": 7
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Locker",
+      "col_number": 10,
+      "code": "A Locker 7",
+      "full_code": "F32-LOCKER-10",
+      "grid_row": 37,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Room",
+      "col_number": 1,
+      "code": "Meeting Room A",
+      "full_code": "F32-MEETING-A",
+      "grid_row": 39,
+      "grid_col": 12
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Room",
+      "col_number": 2,
+      "code": "Meeting Room B",
+      "full_code": "F32-MEETING-B",
+      "grid_row": 42,
+      "grid_col": 12
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "P",
+      "col_number": 1,
+      "code": "F32-P1",
+      "full_code": "F32-P1",
+      "grid_row": 46,
+      "grid_col": 7
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "P",
+      "col_number": 2,
+      "code": "F32-P2",
+      "full_code": "F32-P2",
+      "grid_row": 46,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "P",
+      "col_number": 3,
+      "code": "F32-P3",
+      "full_code": "F32-P3",
+      "grid_row": 46,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "P",
+      "col_number": 4,
+      "code": "F32-P4",
+      "full_code": "F32-P4",
+      "grid_row": 46,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "P",
+      "col_number": 5,
+      "code": "F32-P5",
+      "full_code": "F32-P5",
+      "grid_row": 46,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Q",
+      "col_number": 1,
+      "code": "F32-Q1",
+      "full_code": "F32-Q1",
+      "grid_row": 47,
+      "grid_col": 7
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Q",
+      "col_number": 2,
+      "code": "F32-Q2",
+      "full_code": "F32-Q2",
+      "grid_row": 47,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Q",
+      "col_number": 3,
+      "code": "F32-Q3",
+      "full_code": "F32-Q3",
+      "grid_row": 47,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Q",
+      "col_number": 4,
+      "code": "F32-Q4",
+      "full_code": "F32-Q4",
+      "grid_row": 47,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Q",
+      "col_number": 5,
+      "code": "F32-Q5",
+      "full_code": "F32-Q5",
+      "grid_row": 47,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 17,
+      "code": "ทัศนกมล (โบ)",
+      "full_code": "F32-FIXEDNAME-17",
+      "grid_row": 49,
+      "grid_col": 7
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "Fixed",
+      "col_number": 18,
+      "code": "วีรพงศ์ (กร)",
+      "full_code": "F32-FIXEDNAME-18",
+      "grid_row": 49,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F32",
+      "row_letter": "NoSeat",
+      "col_number": 1,
+      "code": "ไม่มีที่นั่ง",
+      "full_code": "F32-NOSEAT-49-10",
+      "grid_row": 49,
+      "grid_col": 10
     }
   ],
   "teams": [
