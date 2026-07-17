@@ -49,7 +49,16 @@ export function wfhGroupForWeek(weekStart: string): number {
   return ((cyclePos + 5) % 6) + 1;
 }
 
+/**
+ * Reset (2026-07-17): everyone starts fresh from FIRST_BOOKABLE_WEEK regardless of past
+ * attendance/rotation history — nobody is WFH for their first 5 weeks (2026-08-03 through
+ * 2026-08-31). The normal 1-in-6 WFH rotation only kicks in from the 6th week onward; which
+ * group draws which week within that rotation is still to be finalized separately.
+ */
+const ROTATION_GRACE_END = addWeeks(FIRST_BOOKABLE_WEEK, 5);
+
 export function isGroupWfh(groupNumber: number, weekStart: string): boolean {
+  if (weekStart < ROTATION_GRACE_END) return false;
   return groupNumber === wfhGroupForWeek(weekStart);
 }
 
