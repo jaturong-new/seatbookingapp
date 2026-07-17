@@ -1,0 +1,173 @@
+import { revalidatePath } from "next/cache";
+import {
+  getTeams,
+  getAllEmployeesIncludingInactive,
+  addEmployee,
+  setEmployeeActive,
+  listOverridesForWeek,
+  clearOverride,
+} from "@/lib/queries";
+import { getDb } from "@/lib/db";
+import { weekStartOf } from "@/lib/rotation";
+import WeekNav from "@/components/WeekNav";
+
+async function addEmployeeAction(formData: FormData) {
+  "use server";
+  const name = String(formData.get("name") ?? "").trim();
+  const teamId = Number(formData.get("teamId"));
+  if (!name || !teamId) return;
+  addEmployee(name, teamId);
+  revalidatePath("/admin");
+}
+
+async function toggleActiveAction(formData: FormData) {
+  "use server";
+  const employeeId = Number(formData.get("employeeId"));
+  const active = formData.get("active") === "1";
+  setEmployeeActive(employeeId, active);
+  revalidatePath("/admin");
+}
+
+async function clearOverrideAction(formData: FormData) {
+  "use server";
+  const seatFullCode = String(formData.get("seatFullCode"));
+  const weekStart = String(formData.get("weekStart"));
+  const seat = getDb().prepare(`SELECT id FROM seats WHERE full_code = ?`).get(seatFullCode) as
+    | { id: number }
+    | undefined;
+  if (seat) clearOverride(seat.id, weekStart);
+  revalidatePath("/admin");
+}
+
+export default function AdminPage({ searchParams }: { searchParams: { week?: string } }) {
+  const teams = getTeams();
+  const employees = getAllEmployeesIncludingInactive();
+  const weekStart = searchParams.week ?? weekStartOf(new Date());
+  const overrides = listOverridesForWeek(weekStart);
+
+  return (
+    <div className="space-y-8 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-extrabold text-ocean-900 tracking-tight">แผงควบคุมระบบ (Admin)</h1>
+
+      <section className="rounded-2xl border border-slate-200 bg-white/90 backdrop-blur-md p-6 shadow-xl">
+        <h2 className="mb-4 font-bold text-ocean-900 text-lg flex items-center gap-2">
+          <span className="w-1.5 h-6 bg-ocean-500 rounded-full inline-block"></span>
+          เพิ่มพนักงาน
+        </h2>
+        <form action={addEmployeeAction} className="flex flex-wrap items-end gap-4">
+          <div className="flex-1 min-w-[200px]">
+            <label className="block text-xs font-semibold text-slate-500 mb-1">ชื่อ-นามสกุล</label>
+            <input name="name" required className="w-full rounded-lg bg-slate-50 border border-slate-200 text-sm text-ocean-900 px-3 py-2 outline-none focus:border-ocean-500 transition-colors" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 mb-1">ทีม</label>
+            <select name="teamId" required className="rounded-lg bg-white border border-slate-200 text-sm text-ocean-900 px-3 py-2 outline-none focus:border-ocean-500 transition-colors">
+              {teams.map((t) => (
+                <option key={t.id} value={t.id} className="bg-white text-ocean-900">
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button type="submit" className="rounded-lg bg-ocean-600 px-5 py-2 text-sm font-semibold text-white hover:bg-ocean-500 transition-all shadow-md shadow-ocean-500/20">
+            เพิ่ม
+          </button>
+        </form>
+        <p className="mt-3 text-xs text-slate-500 leading-relaxed font-medium">
+          * หมายเหตุ: พนักงานใหม่จะยังไม่มีที่นั่งหมุนเวียนอัตโนมัติจนกว่าจะจองที่นั่งเองครั้งแรก
+        </p>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white/90 backdrop-blur-md p-6 shadow-xl">
+        <h2 className="mb-4 font-bold text-ocean-900 text-lg flex items-center gap-2">
+          <span className="w-1.5 h-6 bg-ocean-500 rounded-full inline-block"></span>
+          รายชื่อพนักงานทั้งหมด
+        </h2>
+        <div className="overflow-hidden rounded-xl border border-slate-100 bg-slate-50/60">
+          <table className="w-full text-sm">
+            <thead className="text-left text-slate-500 border-b border-slate-200 bg-slate-100">
+              <tr>
+                <th className="px-4 py-3 font-semibold">ชื่อ</th>
+                <th className="px-4 py-3 font-semibold">ทีม</th>
+                <th className="px-4 py-3 font-semibold">สถานะ</th>
+                <th className="px-4 py-3 font-semibold">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {employees.map((e) => (
+                <tr key={e.id} className="border-t border-slate-100 hover:bg-ocean-50/50 transition-colors">
+                  <td className="px-4 py-3 text-ocean-900 font-medium">{e.name}</td>
+                  <td className="px-4 py-3 text-slate-500">{e.team_name}</td>
+                  <td className="px-4 py-3">
+                    {e.active ? (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200">Active</span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-400 border border-slate-200">Inactive</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <form action={toggleActiveAction}>
+                      <input type="hidden" name="employeeId" value={e.id} />
+                      <input type="hidden" name="active" value={e.active ? "0" : "1"} />
+                      <button className="text-ocean-600 hover:text-ocean-700 font-semibold hover:underline">
+                        {e.active ? "ปิดใช้งาน" : "เปิดใช้งาน"}
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white/90 backdrop-blur-md p-6 shadow-xl">
+        <h2 className="mb-4 font-bold text-ocean-900 text-lg flex items-center gap-2">
+          <span className="w-1.5 h-6 bg-ocean-500 rounded-full inline-block"></span>
+          การจอง/ปล่อยที่นั่ง (override) ของสัปดาห์
+        </h2>
+        <div className="mb-4">
+          <WeekNav basePath="/admin" weekStart={weekStart} />
+        </div>
+        {overrides.length === 0 ? (
+          <p className="text-sm text-slate-500 font-medium bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">ไม่มี override ในสัปดาห์นี้ (ทุกที่นั่งเป็นค่าอัตโนมัติ)</p>
+        ) : (
+          <div className="overflow-hidden rounded-xl border border-slate-100 bg-slate-50/60">
+            <table className="w-full text-sm">
+              <thead className="text-left text-slate-500 border-b border-slate-200 bg-slate-100">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">ที่นั่ง</th>
+                  <th className="px-4 py-3 font-semibold">สถานะ</th>
+                  <th className="px-4 py-3 font-semibold">พนักงาน</th>
+                  <th className="px-4 py-3 font-semibold">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {overrides.map((o) => (
+                  <tr key={o.id} className="border-t border-slate-100 hover:bg-ocean-50/50 transition-colors">
+                    <td className="px-4 py-3 text-ocean-900 font-medium">{o.seat_full_code}</td>
+                    <td className="px-4 py-3">
+                      {o.status === "booked" ? (
+                        <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-ocean-100 text-ocean-700 border border-ocean-200">จองเอง</span>
+                      ) : (
+                        <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200">ปล่อยว่าง</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-slate-500">{o.employee_name ?? "-"}</td>
+                    <td className="px-4 py-3">
+                      <form action={clearOverrideAction}>
+                        <input type="hidden" name="seatFullCode" value={o.seat_full_code} />
+                        <input type="hidden" name="weekStart" value={o.week_start} />
+                        <button className="text-rose-500 hover:text-rose-600 font-semibold hover:underline">ยกเลิก</button>
+                      </form>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
