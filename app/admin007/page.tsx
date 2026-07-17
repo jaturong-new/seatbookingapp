@@ -8,7 +8,7 @@ import {
   clearOverride,
 } from "@/lib/queries";
 import { getDb } from "@/lib/db";
-import { weekStartOf } from "@/lib/rotation";
+import { weekStartOf, clampToFirstWeek } from "@/lib/rotation";
 import WeekNav from "@/components/WeekNav";
 
 async function addEmployeeAction(formData: FormData) {
@@ -69,7 +69,7 @@ export default function AdminPage({ searchParams }: { searchParams: { week?: str
   const employees = getAllEmployeesIncludingInactive();
   const activeEmployees = employees.filter((e) => e.active);
   const inactiveEmployees = employees.filter((e) => !e.active);
-  const weekStart = searchParams.week ?? weekStartOf(new Date());
+  const weekStart = clampToFirstWeek(searchParams.week ?? weekStartOf(new Date()));
   const overrides = listOverridesForWeek(weekStart);
 
   return (

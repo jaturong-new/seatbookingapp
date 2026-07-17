@@ -1,13 +1,13 @@
 import PersonPicker from "@/components/PersonPicker";
 import MySeatCard from "@/components/MySeatCard";
 import WeekNav from "@/components/WeekNav";
-import { weekStartOf } from "@/lib/rotation";
+import { weekStartOf, clampToFirstWeek } from "@/lib/rotation";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default function HomePage({ searchParams }: { searchParams: { week?: string } }) {
-  const weekStart = searchParams.week ?? weekStartOf(new Date());
+  const weekStart = clampToFirstWeek(searchParams.week ?? weekStartOf(new Date()));
 
   return (
     <div className="bg-white/90 backdrop-blur-md rounded-[2.5rem] p-8 md:p-12 shadow-xl border border-slate-200 max-w-4xl mx-auto">

@@ -6,6 +6,7 @@ type Body = {
   seatId: number;
   weekStart: string;
   employeeId?: number;
+  weeks?: number;
 };
 
 export async function POST(req: NextRequest) {
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
     if (!body.employeeId) {
       return NextResponse.json({ ok: false, error: "missing_fields" }, { status: 400 });
     }
-    const result = bookSeat(seatId, weekStart, body.employeeId);
+    const result = bookSeat(seatId, weekStart, body.employeeId, body.weeks ?? 1);
     return NextResponse.json(result, { status: result.ok ? 200 : 409 });
   }
 

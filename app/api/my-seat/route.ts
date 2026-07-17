@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getEmployeeById, getEmployeeWeekSeat } from "@/lib/queries";
-import { weekStartOf } from "@/lib/rotation";
+import { weekStartOf, clampToFirstWeek } from "@/lib/rotation";
 
 export async function GET(req: NextRequest) {
   const employeeId = Number(req.nextUrl.searchParams.get("employeeId"));
-  const week = req.nextUrl.searchParams.get("week") ?? weekStartOf(new Date());
+  const week = clampToFirstWeek(req.nextUrl.searchParams.get("week") ?? weekStartOf(new Date()));
 
   if (!employeeId) {
     return NextResponse.json({ error: "employeeId required" }, { status: 400 });

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDb } from "@/lib/db";
 import { getTeamWeekView } from "@/lib/queries";
-import { weekStartOf } from "@/lib/rotation";
+import { weekStartOf, clampToFirstWeek } from "@/lib/rotation";
 import WeekNav from "@/components/WeekNav";
 
 export default function TeamPage({
@@ -18,7 +18,7 @@ export default function TeamPage({
     | undefined;
   if (!team) notFound();
 
-  const weekStart = searchParams.week ?? weekStartOf(new Date());
+  const weekStart = clampToFirstWeek(searchParams.week ?? weekStartOf(new Date()));
   const rows = getTeamWeekView(teamId, weekStart);
 
   return (

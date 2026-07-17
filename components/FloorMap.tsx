@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePersonIdentity } from "./PersonPicker";
 
@@ -40,6 +40,33 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
   const employeeId = usePersonIdentity();
   const [pending, setPending] = useState<number | null>(null);
   const [selected, setSelected] = useState<SeatVM | null>(null);
+  const [maxWeeks, setMaxWeeks] = useState(5);
+  const [numWeeks, setNumWeeks] = useState(1);
+
+  const canBook = !!selected && !selected.employee && selected.source !== "fixed";
+
+  useEffect(() => {
+    if (!canBook || !employeeId || !selected) return;
+    let cancelled = false;
+    fetch(`/api/wfh-window?employeeId=${employeeId}&week=${weekStart}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled) return;
+        const cap = Math.min(5, Math.max(1, data.weeksAvailable ?? 5));
+        setMaxWeeks(cap);
+        setNumWeeks(cap);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setMaxWeeks(5);
+          setNumWeeks(1);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected?.id, employeeId]);
 
   const { rowCount, colCount, minRow, minCol } = useMemo(() => {
     if (seats.length === 0) return { rowCount: 1, colCount: 1, minRow: 0, minCol: 0 };
@@ -55,13 +82,13 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
     };
   }, [seats]);
 
-  async function act(seatId: number, action: "book" | "release" | "clear") {
+  async function act(seatId: number, action: "book" | "release" | "clear", weeks?: number) {
     setPending(seatId);
     try {
       const res = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, seatId, weekStart, employeeId }),
+        body: JSON.stringify({ action, seatId, weekStart, employeeId, weeks }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -266,13 +293,37 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
 
             {!employeeId && <p className="mb-4 text-sm font-medium text-amber-300 bg-amber-500/10 p-3 rounded-lg border border-amber-500/20">⚠️ โปรดเลือกชื่อตัวเองที่มุมขวาบนก่อนจอง/ปล่อยที่นั่ง</p>}
 
+            {employeeId && canBook && (
+              <div className="mb-4 rounded-lg bg-[#002f40]/40 p-4 border border-[#04a4cc]/15">
+                <label className="block text-sm font-medium text-cyan-200/70 mb-2">
+                  จองกี่สัปดาห์รวด (1-{maxWeeks})
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={maxWeeks}
+                  value={numWeeks}
+                  onChange={(e) => {
+                    const v = Number(e.target.value);
+                    setNumWeeks(Number.isFinite(v) ? Math.min(maxWeeks, Math.max(1, v)) : 1);
+                  }}
+                  className="w-full rounded-lg bg-[#00222f] border border-[#04a4cc]/25 text-white px-3 py-2 outline-none focus:border-[#44bbdb] transition-colors"
+                />
+                <p className="mt-2 text-xs text-cyan-200/50 leading-relaxed">
+                  {maxWeeks < 5
+                    ? `เข้าออฟฟิศต่อเนื่องได้อีก ${maxWeeks} สัปดาห์ก่อนถึงคิว WFH ของคุณ — ค่าเริ่มต้นคือจองยาวจนถึงสัปดาห์นั้น ปรับลดได้`
+                    : "จองต่อเนื่องได้สูงสุด 5 สัปดาห์ (1 รอบก่อนถึงคิว WFH)"}
+                </p>
+              </div>
+            )}
+
             <div className="flex flex-col gap-2">
-              {employeeId && !selected.employee && selected.source !== "fixed" && (
+              {employeeId && canBook && (
                 <button
-                  onClick={() => act(selected.id, "book")}
+                  onClick={() => act(selected.id, "book", numWeeks)}
                   className="rounded-xl bg-[#04a4cc] px-4 py-2.5 font-semibold text-white shadow-md shadow-[#04a4cc]/30 transition-all hover:bg-[#44bbdb] hover:shadow-lg focus:ring-4 focus:ring-[#04a4cc]/20"
                 >
-                  จองที่นั่งนี้
+                  จองที่นั่งนี้ ({numWeeks} สัปดาห์)
                 </button>
               )}
               {employeeId && selected.source === "auto" && selected.employee?.id === employeeId && (

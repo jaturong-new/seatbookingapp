@@ -185,11 +185,11 @@ export type BookResult =
   | { ok: true }
   | { ok: false; error: "seat_taken" | "already_booked" | "not_found" };
 
-function getFiveWeeks(weekStart: string): string[] {
+function getConsecutiveWeeks(weekStart: string, count: number): string[] {
   const dates: string[] = [];
   const [year, month, day] = weekStart.split("-").map(Number);
   const date = new Date(year, month - 1, day);
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < count; i++) {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, "0");
     const d = String(date.getDate()).padStart(2, "0");
@@ -199,13 +199,15 @@ function getFiveWeeks(weekStart: string): string[] {
   return dates;
 }
 
-export function bookSeat(seatId: number, weekStart: string, employeeId: number): BookResult {
+/** `weekCount`: how many consecutive weeks (1-5) to book starting at `weekStart`, per employee request. */
+export function bookSeat(seatId: number, weekStart: string, employeeId: number, weekCount: number): BookResult {
   const db = getDb();
   const seat = db.prepare(`SELECT * FROM seats WHERE id = ?`).get(seatId) as Seat | undefined;
   const employee = getEmployeeById(employeeId);
   if (!seat || !employee) return { ok: false, error: "not_found" };
 
-  const weeks = getFiveWeeks(weekStart);
+  const clampedCount = Math.min(5, Math.max(1, Math.round(weekCount) || 1));
+  const weeks = getConsecutiveWeeks(weekStart, clampedCount);
 
   // Check if it's a fixed seat
   const inPool = db.prepare(`SELECT 1 FROM team_seats WHERE seat_id = ? LIMIT 1`).get(seatId);

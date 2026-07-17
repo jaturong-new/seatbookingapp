@@ -21,6 +21,13 @@ function weekOffset(fromWeekStart: string, toWeekStart: string): number {
   return Math.round((to - from) / (7 * 24 * 60 * 60 * 1000));
 }
 
+/** Booking opens for the week of 2026-08-03 onward; earlier weeks are not selectable in the UI. */
+export const FIRST_BOOKABLE_WEEK = "2026-08-03";
+
+export function clampToFirstWeek(weekStart: string): string {
+  return weekStart < FIRST_BOOKABLE_WEEK ? FIRST_BOOKABLE_WEEK : weekStart;
+}
+
 export function getSeedWeekStart(): string {
   const db = getDb();
   const row = db.prepare(`SELECT value FROM meta WHERE key = 'seed_week_start'`).get() as
@@ -30,9 +37,9 @@ export function getSeedWeekStart(): string {
 }
 
 /**
- * Real office policy: each team's roster is split into 4 even groups; every week 3 of the 4
- * groups are in-office and 1 is WFH, cycling so each person gets 1-in-4 weeks off
- * (office 3 weeks, WFH 1 week). The WFH group for a given week cycles 4 -> 1 -> 2 -> 3 -> 4 ...
+ * Real office policy: each team's roster is split into 6 even groups; every week 5 of the 6
+ * groups are in-office and 1 is WFH, cycling so each person gets 1-in-6 weeks off
+ * (office 5 weeks, WFH 1 week). The WFH group for a given week cycles 6 -> 1 -> 2 -> ... -> 6 ...
  * starting from the seed week.
  */
 export function wfhGroupForWeek(weekStart: string): number {
@@ -44,6 +51,23 @@ export function wfhGroupForWeek(weekStart: string): number {
 
 export function isGroupWfh(groupNumber: number, weekStart: string): boolean {
   return groupNumber === wfhGroupForWeek(weekStart);
+}
+
+/**
+ * How many consecutive weeks starting at `weekStart` (inclusive) the group stays in-office
+ * before hitting its next WFH week, capped at `cap`. Since the cycle is 5-in/1-out, this is
+ * naturally at most 5 — used to cap/pre-fill the "how many weeks in a row" booking input so
+ * nobody books past the week they'll be WFH anyway.
+ */
+export function weeksUntilWfh(groupNumber: number, weekStart: string, cap = 5): number {
+  let count = 0;
+  let w = weekStart;
+  while (count < cap) {
+    if (isGroupWfh(groupNumber, w)) break;
+    count++;
+    w = addWeeks(w, 1);
+  }
+  return Math.max(1, count);
 }
 
 type TeamPool = { seatId: number; fullCode: string }[];

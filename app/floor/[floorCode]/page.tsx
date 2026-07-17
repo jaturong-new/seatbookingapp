@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getFloorByCode, getFloorAssignments } from "@/lib/queries";
-import { weekStartOf } from "@/lib/rotation";
+import { weekStartOf, clampToFirstWeek } from "@/lib/rotation";
 import WeekNav from "@/components/WeekNav";
 import FloorMap from "@/components/FloorMap";
 import PersonPicker from "@/components/PersonPicker";
@@ -18,7 +18,7 @@ export default function FloorPage({
   const floor = getFloorByCode(params.floorCode);
   if (!floor) notFound();
 
-  const weekStart = searchParams.week ?? weekStartOf(new Date());
+  const weekStart = clampToFirstWeek(searchParams.week ?? weekStartOf(new Date()));
   const assignments = getFloorAssignments(floor.id, weekStart);
 
   const seats = assignments.map((a) => ({
