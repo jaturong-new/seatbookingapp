@@ -36,11 +36,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </nav>
  
               <div className="h-5 w-px bg-[#04a4cc]/20 hidden md:block"></div>
- 
+
               <nav className="flex items-center gap-2 text-sm font-medium">
                 <span className="text-cyan-200/60 mr-2 text-xs uppercase tracking-wider">ทีม</span>
                 {teams.map((t) => (
                   <Link key={t.id} href={`/team/${t.id}`} className="rounded-full px-3 py-1.5 text-cyan-100 transition-all hover:bg-[#04a4cc]/15 hover:text-white">
+                    {t.name}
+                  </Link>
+                ))}
+              </nav>
+
+              <div className="h-5 w-px bg-[#04a4cc]/20 hidden md:block"></div>
+
+              <nav className="flex items-center gap-2 text-sm font-medium">
+                <span className="text-cyan-200/60 mr-2 text-xs uppercase tracking-wider">ตารางเข้า</span>
+                {teams.map((t) => (
+                  <Link key={t.id} href={`/team/${t.id}/schedule`} className="rounded-full px-3 py-1.5 text-cyan-100 transition-all hover:bg-[#04a4cc]/15 hover:text-white">
                     {t.name}
                   </Link>
                 ))}

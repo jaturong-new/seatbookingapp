@@ -322,3 +322,28 @@ export function getAllEmployeesIncludingInactive(): (Employee & { team_name: str
     )
     .all() as (Employee & { team_name: string })[];
 }
+
+export type ScheduleRow = {
+  employee: Employee;
+  weeks: { weekStart: string; wfh: boolean }[];
+};
+
+/** Which weeks each rotating team member is in-office vs WFH, for a given list of weeks. Excludes fixed-seat leads — they always attend, nothing to plan around. */
+export function getTeamScheduleView(teamId: number, weekStarts: string[]): ScheduleRow[] {
+  const roster = getDb()
+    .prepare(
+      `SELECT * FROM employees
+       WHERE team_id = ? AND active = 1
+         AND NOT EXISTS (SELECT 1 FROM seats s WHERE s.code = employees.name)
+       ORDER BY name`
+    )
+    .all(teamId) as Employee[];
+
+  return roster.map((employee) => ({
+    employee,
+    weeks: weekStarts.map((weekStart) => ({
+      weekStart,
+      wfh: isGroupWfh(employee.group_number, weekStart),
+    })),
+  }));
+}
