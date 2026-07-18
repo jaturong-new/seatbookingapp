@@ -104,7 +104,7 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap gap-5 text-sm font-semibold px-5 py-3.5 bg-[#002836]/80 rounded-2xl border border-cyan-500/20 shadow-lg backdrop-blur-sm w-fit">
+      <div className="mb-4 sm:mb-6 flex flex-wrap gap-3 sm:gap-5 text-xs sm:text-sm font-semibold px-3 sm:px-5 py-2.5 sm:py-3.5 bg-[#002836]/80 rounded-2xl border border-cyan-500/20 shadow-lg backdrop-blur-sm w-fit">
         <Legend swatch="bg-emerald-50 border-emerald-300" label="ว่าง จองได้" />
         <Legend swatch="bg-[#c1c8ab]/30 border-[#c1c8ab]" label="หมุนเวียน (auto)" />
         <Legend swatch="bg-gradient-to-br from-[#44bbdb] to-[#04a4cc] border-[#04a4cc]" label="จองเอง (booked)" />
@@ -112,18 +112,18 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
         {employeeId && <Legend swatch="ring-2 ring-[#ff8300] bg-white border-slate-200" label="ที่นั่งของฉัน" />}
       </div>
 
-      <div className="overflow-x-auto pb-8">
+      <div className="overflow-x-auto pb-8 touch-pan-x">
         <div className="mx-auto w-fit">
           {floorName && (
-            <div className="mb-5 rounded-2xl bg-gradient-to-r from-[#00222f] via-[#004a63] to-[#00222f] px-6 py-3.5 text-center text-xl font-extrabold tracking-[0.3em] text-white shadow-lg border border-cyan-400/25 uppercase">
+            <div className="mb-3 sm:mb-5 rounded-2xl bg-gradient-to-r from-[#00222f] via-[#004a63] to-[#00222f] px-4 sm:px-6 py-2.5 sm:py-3.5 text-center text-base sm:text-xl font-extrabold tracking-[0.2em] sm:tracking-[0.3em] text-white shadow-lg border border-cyan-400/25 uppercase">
               {floorName}
             </div>
           )}
         <div
-          className="inline-grid gap-3.5 p-10 rounded-[2rem] border border-slate-200/80 shadow-2xl bg-[radial-gradient(rgba(4,164,204,0.12)_1px,transparent_1px)] [background-size:20px_20px] bg-white"
+          className="inline-grid gap-2 sm:gap-3.5 p-4 sm:p-10 rounded-[2rem] border border-slate-200/80 shadow-2xl bg-[radial-gradient(rgba(4,164,204,0.12)_1px,transparent_1px)] [background-size:20px_20px] bg-white"
           style={{
-            gridTemplateRows: `repeat(${rowCount}, 5rem)`,
-            gridTemplateColumns: `repeat(${colCount}, 7.5rem)`,
+            gridTemplateRows: `repeat(${rowCount}, var(--seat-cell-h))`,
+            gridTemplateColumns: `repeat(${colCount}, var(--seat-cell-w))`,
           }}
         >
           {seats.map((seat) => {
@@ -245,12 +245,12 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
                 onClick={() => setSelected(seat)}
                 disabled={pending === seat.id}
                 style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
-                className={`flex h-full w-full flex-col items-center justify-center rounded-2xl border transition-all duration-300 px-2 text-center text-sm leading-tight ${base} ${
+                className={`flex h-full w-full flex-col items-center justify-center rounded-lg sm:rounded-2xl border transition-all duration-300 px-1 sm:px-2 text-center text-[10px] sm:text-sm leading-tight ${base} ${
                   isMine ? "ring-2 ring-[#ff8300] shadow-lg shadow-[#ff8300]/40 z-10" : ""
                 } ${pending === seat.id ? "opacity-50 scale-95" : ""}`}
                 title={seat.code}
               >
-                <span className={`font-bold mb-1 text-base ${
+                <span className={`font-bold mb-0.5 sm:mb-1 text-xs sm:text-base ${
                   seat.source === 'booked' ? 'text-white' :
                   seat.source === 'auto' ? 'text-[#04a4cc]' :
                   'text-emerald-700'
@@ -291,7 +291,7 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
               )}
             </div>
 
-            {!employeeId && <p className="mb-4 text-sm font-medium text-amber-300 bg-amber-500/10 p-3 rounded-lg border border-amber-500/20">⚠️ โปรดเลือกชื่อตัวเองที่มุมขวาบนก่อนจอง/ปล่อยที่นั่ง</p>}
+            {!employeeId && <p className="mb-4 text-sm font-medium text-amber-300 bg-amber-500/10 p-3 rounded-lg border border-amber-500/20">⚠️ โปรดเลือกชื่อตัวเองด้านบนก่อนจอง/ปล่อยที่นั่ง</p>}
 
             {employeeId && canBook && (
               <div className="mb-4 rounded-lg bg-[#002f40]/40 p-4 border border-[#04a4cc]/15">

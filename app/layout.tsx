@@ -19,48 +19,48 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="th">
       <body className={`${notoSansThai.className} ${outfit.variable} min-h-screen text-white selection:bg-blue-500/30 selection:text-white`}>
         <header className="sticky top-0 z-50 border-b border-[#04a4cc]/15 bg-[#002330]/75 backdrop-blur-xl shadow-lg">
-          <div className="mx-auto flex max-w-[98vw] flex-wrap items-center justify-between gap-y-4 px-6 py-4">
-            <Link href="/" className="flex items-center gap-3 text-xl font-bold tracking-tight text-white transition-colors hover:text-[#44bbdb]">
-              <img src="/favicon.png" alt="Ocean Life Logo" className="h-8 w-8 object-contain rounded-lg shadow-sm" />
+          <div className="mx-auto flex max-w-[98vw] flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-y-2 sm:gap-y-4 px-3 sm:px-6 py-2.5 sm:py-4">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 text-base sm:text-xl font-bold tracking-tight text-white transition-colors hover:text-[#44bbdb] shrink-0">
+              <img src="/favicon.png" alt="Ocean Life Logo" className="h-6 w-6 sm:h-8 sm:w-8 object-contain rounded-lg shadow-sm" />
               Mobile Office
             </Link>
- 
-            <div className="flex flex-wrap items-center gap-8">
-              <nav className="flex items-center gap-2 text-sm font-medium">
-                <span className="text-cyan-200/60 mr-2 text-xs uppercase tracking-wider">ผังชั้น</span>
+
+            <div className="flex items-center gap-4 sm:gap-8 overflow-x-auto sm:overflow-visible flex-nowrap sm:flex-wrap [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden -mx-3 px-3 sm:mx-0 sm:px-0">
+              <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium shrink-0">
+                <span className="text-cyan-200/60 mr-1 sm:mr-2 text-[10px] sm:text-xs uppercase tracking-wider whitespace-nowrap">ผังชั้น</span>
                 {floors.map((f) => (
-                  <Link key={f.code} href={`/floor/${f.code}`} className="rounded-full px-3 py-1.5 text-cyan-100 transition-all hover:bg-[#04a4cc]/15 hover:text-white">
+                  <Link key={f.code} href={`/floor/${f.code}`} className="rounded-full px-2.5 sm:px-3 py-1 sm:py-1.5 text-cyan-100 transition-all hover:bg-[#04a4cc]/15 hover:text-white whitespace-nowrap">
                     {f.name}
                   </Link>
                 ))}
               </nav>
- 
-              <div className="h-5 w-px bg-[#04a4cc]/20 hidden md:block"></div>
 
-              <nav className="flex items-center gap-2 text-sm font-medium">
-                <span className="text-cyan-200/60 mr-2 text-xs uppercase tracking-wider">ทีม</span>
+              <div className="h-5 w-px bg-[#04a4cc]/20 hidden md:block shrink-0"></div>
+
+              <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium shrink-0">
+                <span className="text-cyan-200/60 mr-1 sm:mr-2 text-[10px] sm:text-xs uppercase tracking-wider whitespace-nowrap">ทีม</span>
                 {teams.map((t) => (
-                  <Link key={t.id} href={`/team/${t.id}`} className="rounded-full px-3 py-1.5 text-cyan-100 transition-all hover:bg-[#04a4cc]/15 hover:text-white">
+                  <Link key={t.id} href={`/team/${t.id}`} className="rounded-full px-2.5 sm:px-3 py-1 sm:py-1.5 text-cyan-100 transition-all hover:bg-[#04a4cc]/15 hover:text-white whitespace-nowrap">
                     {t.name}
                   </Link>
                 ))}
               </nav>
 
-              <div className="h-5 w-px bg-[#04a4cc]/20 hidden md:block"></div>
+              <div className="h-5 w-px bg-[#04a4cc]/20 hidden md:block shrink-0"></div>
 
-              <nav className="flex items-center gap-2 text-sm font-medium">
-                <span className="text-cyan-200/60 mr-2 text-xs uppercase tracking-wider">ตารางเข้า</span>
+              <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium shrink-0">
+                <span className="text-cyan-200/60 mr-1 sm:mr-2 text-[10px] sm:text-xs uppercase tracking-wider whitespace-nowrap">ตารางเข้า</span>
                 {teams.map((t) => (
-                  <Link key={t.id} href={`/team/${t.id}/schedule`} className="rounded-full px-3 py-1.5 text-cyan-100 transition-all hover:bg-[#04a4cc]/15 hover:text-white">
+                  <Link key={t.id} href={`/team/${t.id}/schedule`} className="rounded-full px-2.5 sm:px-3 py-1 sm:py-1.5 text-cyan-100 transition-all hover:bg-[#04a4cc]/15 hover:text-white whitespace-nowrap">
                     {t.name}
                   </Link>
                 ))}
               </nav>
             </div>
- 
+
           </div>
         </header>
-        <main className="mx-auto max-w-[98vw] px-6 py-4 animate-fade-in-up">
+        <main className="mx-auto max-w-[98vw] px-3 sm:px-6 py-3 sm:py-4 animate-fade-in-up">
           {children}
         </main>
       </body>

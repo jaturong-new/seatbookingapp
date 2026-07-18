@@ -26,6 +26,17 @@ body {
   color: #ffffff;
 }
 
+:root {
+  --seat-cell-h: 5rem;
+  --seat-cell-w: 7.5rem;
+}
+@media (max-width: 640px) {
+  :root {
+    --seat-cell-h: 3.5rem;
+    --seat-cell-w: 4.25rem;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

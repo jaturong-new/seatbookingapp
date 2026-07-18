@@ -1153,6 +1153,285 @@
       "full_code": "วรัชยานันทน์ พิภัชสิทธา",
       "grid_row": 94,
       "grid_col": 10
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 8,
+      "code": "ปาริฉัตร (แก้ว)",
+      "full_code": "F5-CTX-92-8",
+      "grid_row": 92,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 10,
+      "code": "F5-I1 (อื่น)",
+      "full_code": "F5-CTX-92-10",
+      "grid_row": 92,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 11,
+      "code": "ขนิษฐา (หยก)",
+      "full_code": "F5-CTX-92-11",
+      "grid_row": 92,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 13,
+      "code": "อนุชา (ลิ้ง)",
+      "full_code": "F5-CTX-92-13",
+      "grid_row": 92,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 14,
+      "code": "F5-L1 (อื่น)",
+      "full_code": "F5-CTX-92-14",
+      "grid_row": 92,
+      "grid_col": 14
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 17,
+      "code": "F5-M1 (อื่น)",
+      "full_code": "F5-CTX-92-17",
+      "grid_row": 92,
+      "grid_col": 17
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 19,
+      "code": "Bar Seat 1",
+      "full_code": "F5-CTX-92-19",
+      "grid_row": 92,
+      "grid_col": 19
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 8,
+      "code": "F5-H2 (อื่น)",
+      "full_code": "F5-CTX-93-8",
+      "grid_row": 93,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 11,
+      "code": "ทินกรณ์ (กลอฟ)",
+      "full_code": "F5-CTX-93-11",
+      "grid_row": 93,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 13,
+      "code": "ธนากฤต (ท๊อป)",
+      "full_code": "F5-CTX-93-13",
+      "grid_row": 93,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 14,
+      "code": "F5-L2 (อื่น)",
+      "full_code": "F5-CTX-93-14",
+      "grid_row": 93,
+      "grid_col": 14
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 17,
+      "code": "F5-M2 (อื่น)",
+      "full_code": "F5-CTX-93-17",
+      "grid_row": 93,
+      "grid_col": 17
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 19,
+      "code": "Bar Seat 2",
+      "full_code": "F5-CTX-93-19",
+      "grid_row": 93,
+      "grid_col": 19
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 8,
+      "code": "ศิริศักดิ์ (แฟ้ม)",
+      "full_code": "F5-CTX-94-8",
+      "grid_row": 94,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 11,
+      "code": "วารุณี (จอย)",
+      "full_code": "F5-CTX-94-11",
+      "grid_row": 94,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 13,
+      "code": "รังสิมันต์ (เนม)",
+      "full_code": "F5-CTX-94-13",
+      "grid_row": 94,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 14,
+      "code": "F5-L3 (อื่น)",
+      "full_code": "F5-CTX-94-14",
+      "grid_row": 94,
+      "grid_col": 14
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 17,
+      "code": "F5-M3 (อื่น)",
+      "full_code": "F5-CTX-94-17",
+      "grid_row": 94,
+      "grid_col": 17
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 19,
+      "code": "Bar Seat 3",
+      "full_code": "F5-CTX-94-19",
+      "grid_row": 94,
+      "grid_col": 19
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 8,
+      "code": "วรัชญา (เจน)",
+      "full_code": "F5-CTX-95-8",
+      "grid_row": 95,
+      "grid_col": 8
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 10,
+      "code": "ปณิชา (เล็ก)",
+      "full_code": "F5-CTX-95-10",
+      "grid_row": 95,
+      "grid_col": 10
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 11,
+      "code": "อมรพรรณ (กุ๊ก)",
+      "full_code": "F5-CTX-95-11",
+      "grid_row": 95,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 13,
+      "code": "ศุภชัย (แบงค์)",
+      "full_code": "F5-CTX-95-13",
+      "grid_row": 95,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 14,
+      "code": "F5-L4 (อื่น)",
+      "full_code": "F5-CTX-95-14",
+      "grid_row": 95,
+      "grid_col": 14
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 17,
+      "code": "F5-M4 (อื่น)",
+      "full_code": "F5-CTX-95-17",
+      "grid_row": 95,
+      "grid_col": 17
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 19,
+      "code": "Bar Seat 4",
+      "full_code": "F5-CTX-95-19",
+      "grid_row": 95,
+      "grid_col": 19
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 13,
+      "code": "กันต์กมล (จ๋าย)",
+      "full_code": "F5-CTX-96-13",
+      "grid_row": 96,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 14,
+      "code": "F5-L5 (อื่น)",
+      "full_code": "F5-CTX-96-14",
+      "grid_row": 96,
+      "grid_col": 14
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 11,
+      "code": "สุลัดดา (อ้อ)",
+      "full_code": "F5-CTX-97-11",
+      "grid_row": 97,
+      "grid_col": 11
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 13,
+      "code": "โชติกา (พอย)",
+      "full_code": "F5-CTX-97-13",
+      "grid_row": 97,
+      "grid_col": 13
+    },
+    {
+      "floor_code": "F5",
+      "row_letter": "Ctx",
+      "col_number": 14,
+      "code": "Temp Fix",
+      "full_code": "F5-CTX-97-14",
+      "grid_row": 97,
+      "grid_col": 14
     }
   ],
   "teams": [
