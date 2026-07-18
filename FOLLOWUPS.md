@@ -7,19 +7,12 @@ Read this before touching `data/dev_attendance.json`, F32 seat data, or the
 
 ## Open questions
 
-- **"บดินทร์" name mismatch.** The Booking Seat sheet has `บดินทร์ อิทธิพลชยานันท์`
-  rotating through F5/F32 seats across many rounds. Our employees table instead
-  has `บดินทร์ รินเย็น`, who never appears in any of the 42 real rounds. Unclear
-  if this is the same person with the wrong surname in our DB, or two different
-  people and the sheet's person just isn't in our system at all. Needs a human
-  to confirm against HR records before renaming/adding anyone.
-
-- **5 employees with zero coverage in the 42 real rounds**: ดรุฑ จงบรรเจิดเพชร,
-  พีรพัฒน์ กิจพร้อมผล, คมชาญ จันทร์นาค, โอภาส ตรีนัย, บดินทร์ รินเย็น (see above).
-  They currently fall back to the synthetic group-rotation calc (`isGroupWfh`)
-  for WFH status on the schedule page, since the real sheet never scheduled them
-  a seat in any of the 42 rounds. Confirm whether they're legitimately extra/new
-  hires beyond the historical roster, or a data problem.
+- **4 employees with zero coverage in the 42 real rounds**: ดรุฑ จงบรรเจิดเพชร,
+  พีรพัฒน์ กิจพร้อมผล, คมชาญ จันทร์นาค, โอภาส ตรีนัย. They currently fall back
+  to the synthetic group-rotation calc (`isGroupWfh`) for WFH status on the
+  schedule page, since the real sheet never scheduled them a seat in any of the
+  42 rounds. Confirm whether they're legitimately extra/new hires beyond the
+  historical roster, or a data problem.
 
 ## Known limitations
 
@@ -61,3 +54,7 @@ Read this before touching `data/dev_attendance.json`, F32 seat data, or the
   from the Booking Seat sheet — excluding F32 rows entirely (an earlier
   extraction bug) wrongly marked people WFH on weeks they were actually
   scheduled to attend (caught via จาตุรงค์ ทองแดง, week of 2026-08-31).
+- "บดินทร์" name mismatch was confirmed same person — renamed
+  `บดินทร์ รินเย็น` → `บดินทร์ อิทธิพลชยานันท์` (his updated surname) in both
+  the DB and `data/seed.json`. He now gets real attendance data instead of
+  the synthetic fallback.
