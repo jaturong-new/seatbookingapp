@@ -40,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium shrink-0">
                 <span className="text-cyan-200/60 mr-1 sm:mr-2 text-[10px] sm:text-xs uppercase tracking-wider whitespace-nowrap">ทีม</span>
                 {teams.map((t) => (
-                  <Link key={t.id} href={`/team/${t.id}`} className="rounded-full px-2.5 sm:px-3 py-1 sm:py-1.5 text-cyan-100 transition-all hover:bg-[#04a4cc]/15 hover:text-white whitespace-nowrap">
+                  <Link key={t.id} href={`/team/${t.id}`} className="rounded-full border border-[#04a4cc]/30 bg-[#04a4cc]/10 px-2.5 sm:px-3 py-1 sm:py-1.5 text-cyan-100 transition-all hover:bg-[#04a4cc]/25 hover:border-[#04a4cc]/50 hover:text-white whitespace-nowrap">
                     {t.name}
                   </Link>
                 ))}
@@ -51,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium shrink-0">
                 <span className="text-cyan-200/60 mr-1 sm:mr-2 text-[10px] sm:text-xs uppercase tracking-wider whitespace-nowrap">ตารางเข้า</span>
                 {teams.map((t) => (
-                  <Link key={t.id} href={`/team/${t.id}/schedule`} className="rounded-full px-2.5 sm:px-3 py-1 sm:py-1.5 text-cyan-100 transition-all hover:bg-[#04a4cc]/15 hover:text-white whitespace-nowrap">
+                  <Link key={t.id} href={`/team/${t.id}/schedule`} className="rounded-full border border-[#04a4cc]/30 bg-[#04a4cc]/10 px-2.5 sm:px-3 py-1 sm:py-1.5 text-cyan-100 transition-all hover:bg-[#04a4cc]/25 hover:border-[#04a4cc]/50 hover:text-white whitespace-nowrap">
                     {t.name}
                   </Link>
                 ))}
