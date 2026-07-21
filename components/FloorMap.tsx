@@ -88,11 +88,19 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
       const res = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        // employeeId is only honored in legacy mode; with auth on the server uses the session identity
         body: JSON.stringify({ action, seatId, weekStart, employeeId, weeks }),
       });
       const data = await res.json();
       if (!res.ok) {
-        alert(data.error === "seat_taken" ? "ที่นั่งนี้ถูกจองไปแล้ว" : data.error === "already_booked" ? "คุณจองที่นั่งอื่นไว้แล้วในสัปดาห์นี้" : "ทำรายการไม่สำเร็จ");
+        alert(
+          data.error === "seat_taken" ? "ที่นั่งนี้ถูกจองไปแล้ว"
+          : data.error === "already_booked" ? "คุณจองที่นั่งอื่นไว้แล้วในสัปดาห์นี้"
+          : data.error === "unauthorized" ? "กรุณา login ด้วย Google ก่อนทำรายการ"
+          : data.error === "not_mapped" ? "กรุณาเลือกชื่อของคุณ (ผูกกับ email) ก่อนทำรายการ"
+          : data.error === "forbidden" ? "จัดการได้เฉพาะที่นั่งของตัวเองเท่านั้น"
+          : "ทำรายการไม่สำเร็จ"
+        );
         return;
       }
       setSelected(null);
@@ -291,7 +299,7 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
               )}
             </div>
 
-            {!employeeId && <p className="mb-4 text-sm font-medium text-amber-300 bg-amber-500/10 p-3 rounded-lg border border-amber-500/20">⚠️ โปรดเลือกชื่อตัวเองด้านบนก่อนจอง/ปล่อยที่นั่ง</p>}
+            {!employeeId && <p className="mb-4 text-sm font-medium text-amber-300 bg-amber-500/10 p-3 rounded-lg border border-amber-500/20">⚠️ โปรดระบุตัวตนด้านบนก่อนจอง/ปล่อยที่นั่ง</p>}
 
             {employeeId && canBook && (
               <div className="mb-4 rounded-lg bg-[#002f40]/40 p-4 border border-[#04a4cc]/15">

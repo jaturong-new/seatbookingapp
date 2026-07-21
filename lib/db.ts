@@ -12,12 +12,24 @@ declare global {
   var __seatDb: Database.Database | undefined;
 }
 
+function migrate(db: Database.Database) {
+  // schema.sql only creates missing tables; existing DBs need the email column added in place
+  const cols = db.prepare(`PRAGMA table_info(employees)`).all() as { name: string }[];
+  if (cols.length > 0 && !cols.some((c) => c.name === "email")) {
+    db.exec(`ALTER TABLE employees ADD COLUMN email TEXT`);
+  }
+  db.exec(
+    `CREATE UNIQUE INDEX IF NOT EXISTS idx_employees_email ON employees(email) WHERE email IS NOT NULL`
+  );
+}
+
 function createConnection(): Database.Database {
   const db = new Database(DB_PATH);
   db.pragma("journal_mode = WAL");
   db.pragma("foreign_keys = ON");
   const schema = fs.readFileSync(SCHEMA_PATH, "utf-8");
   db.exec(schema);
+  migrate(db);
   return db;
 }
 

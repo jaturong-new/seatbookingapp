@@ -4,15 +4,35 @@ import {
   getAllEmployeesIncludingInactive,
   addEmployee,
   setEmployeeActive,
+  setEmployeeEmail,
   listOverridesForWeek,
   clearOverride,
 } from "@/lib/queries";
 import { getDb } from "@/lib/db";
+import { AUTH_ENABLED, getSessionEmail } from "@/lib/auth";
 import { weekStartOf, clampToFirstWeek } from "@/lib/rotation";
 import WeekNav from "@/components/WeekNav";
 
+function adminEmails(): string[] {
+  return (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+/** Admin gate: when auth is on and ADMIN_EMAILS is set, only those Google accounts may enter
+ * (and use the actions below). Auth off = legacy mode, page stays open as before. */
+async function assertAdmin(): Promise<boolean> {
+  if (!AUTH_ENABLED) return true;
+  const allowed = adminEmails();
+  if (allowed.length === 0) return true; // not configured -> open (dev mode)
+  const email = await getSessionEmail();
+  return !!email && allowed.includes(email);
+}
+
 async function addEmployeeAction(formData: FormData) {
   "use server";
+  if (!(await assertAdmin())) return;
   const name = String(formData.get("name") ?? "").trim();
   const teamId = Number(formData.get("teamId"));
   if (!name || !teamId) return;
@@ -22,14 +42,26 @@ async function addEmployeeAction(formData: FormData) {
 
 async function toggleActiveAction(formData: FormData) {
   "use server";
+  if (!(await assertAdmin())) return;
   const employeeId = Number(formData.get("employeeId"));
   const active = formData.get("active") === "1";
   setEmployeeActive(employeeId, active);
   revalidatePath("/admin007");
 }
 
+async function setEmailAction(formData: FormData) {
+  "use server";
+  if (!(await assertAdmin())) return;
+  const employeeId = Number(formData.get("employeeId"));
+  const email = String(formData.get("email") ?? "").trim();
+  if (!employeeId) return;
+  setEmployeeEmail(employeeId, email || null);
+  revalidatePath("/admin007");
+}
+
 async function clearOverrideAction(formData: FormData) {
   "use server";
+  if (!(await assertAdmin())) return;
   const seatFullCode = String(formData.get("seatFullCode"));
   const weekStart = String(formData.get("weekStart"));
   const seat = getDb().prepare(`SELECT id FROM seats WHERE full_code = ?`).get(seatFullCode) as
@@ -39,11 +71,26 @@ async function clearOverrideAction(formData: FormData) {
   revalidatePath("/admin007");
 }
 
-function EmployeeRow({ e, muted }: { e: { id: number; name: string; team_name: string; active: number }; muted: boolean }) {
+function EmployeeRow({ e, muted }: { e: { id: number; name: string; team_name: string; active: number; email: string | null }; muted: boolean }) {
   return (
     <tr className={`border-t border-slate-100 transition-colors ${muted ? "opacity-50 hover:opacity-100" : "hover:bg-ocean-50/50"}`}>
       <td className="px-4 py-3 text-ocean-900 font-medium">{e.name}</td>
       <td className="px-4 py-3 text-slate-500">{e.team_name}</td>
+      <td className="px-4 py-3">
+        <form action={setEmailAction} className="flex items-center gap-2">
+          <input type="hidden" name="employeeId" value={e.id} />
+          <input
+            name="email"
+            type="email"
+            defaultValue={e.email ?? ""}
+            placeholder="ยังไม่ผูก"
+            className="w-48 rounded-md bg-slate-50 border border-slate-200 text-xs text-ocean-900 px-2 py-1 outline-none focus:border-ocean-500 transition-colors placeholder:text-slate-300"
+          />
+          <button className="text-ocean-600 hover:text-ocean-700 text-xs font-semibold hover:underline whitespace-nowrap" title="บันทึก email (เว้นว่าง = ล้าง mapping)">
+            บันทึก
+          </button>
+        </form>
+      </td>
       <td className="px-4 py-3">
         {e.active ? (
           <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200">Active</span>
@@ -64,7 +111,16 @@ function EmployeeRow({ e, muted }: { e: { id: number; name: string; team_name: s
   );
 }
 
-export default function AdminPage({ searchParams }: { searchParams: { week?: string } }) {
+export default async function AdminPage({ searchParams }: { searchParams: { week?: string } }) {
+  if (!(await assertAdmin())) {
+    return (
+      <div className="max-w-md mx-auto mt-16 rounded-2xl border border-rose-200 bg-white/90 p-8 text-center shadow-xl">
+        <div className="text-3xl mb-3">🚫</div>
+        <h1 className="text-xl font-bold text-rose-600 mb-2">ไม่มีสิทธิ์เข้าถึงหน้านี้</h1>
+        <p className="text-sm text-slate-500">ต้อง login ด้วย Google account ที่อยู่ในรายชื่อ admin (ADMIN_EMAILS)</p>
+      </div>
+    );
+  }
   const teams = getTeams();
   const employees = getAllEmployeesIncludingInactive();
   const activeEmployees = employees.filter((e) => e.active);
@@ -119,6 +175,7 @@ export default function AdminPage({ searchParams }: { searchParams: { week?: str
               <tr>
                 <th className="px-4 py-3 font-semibold">ชื่อ</th>
                 <th className="px-4 py-3 font-semibold">ทีม</th>
+                <th className="px-4 py-3 font-semibold">Email (Google login)</th>
                 <th className="px-4 py-3 font-semibold">สถานะ</th>
                 <th className="px-4 py-3 font-semibold">จัดการ</th>
               </tr>
@@ -129,7 +186,7 @@ export default function AdminPage({ searchParams }: { searchParams: { week?: str
               ))}
               {inactiveEmployees.length > 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-100/80 border-t border-slate-200">
+                  <td colSpan={5} className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-100/80 border-t border-slate-200">
                     ปิดใช้งาน ({inactiveEmployees.length})
                   </td>
                 </tr>

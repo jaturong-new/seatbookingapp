@@ -37,7 +37,7 @@ export default function MySeatCard({ weekStart }: { weekStart: string }) {
   if (!employeeId || (data && "error" in data)) {
     return (
       <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-sm font-medium text-slate-500">
-        👆 โปรดเลือกชื่อของคุณด้านบน เพื่อดูสถานะที่นั่งในสัปดาห์นี้
+        👆 โปรดระบุตัวตนของคุณด้านบน เพื่อดูสถานะที่นั่งในสัปดาห์นี้
       </div>
     );
   }

@@ -29,13 +29,20 @@ CREATE TABLE IF NOT EXISTS teams (
 -- 3 of the 4 groups are in-office and 1 is WFH (see week_group_is_wfh in rotation.ts). Real
 -- per-person group membership isn't available from source data, so groups are assigned evenly
 -- and deterministically (round-robin by roster order) rather than reflecting the real assignment.
+-- email: Google Workspace account bound to this person (e.g. manoch.su@ocean.co.th).
+-- NULL = not claimed yet; the owner claims it on first Google sign-in via the claim flow,
+-- and from then on the server derives booking identity from the session, never from the client.
 CREATE TABLE IF NOT EXISTS employees (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   team_id INTEGER NOT NULL REFERENCES teams(id),
   active INTEGER NOT NULL DEFAULT 1,
-  group_number INTEGER NOT NULL CHECK (group_number BETWEEN 1 AND 6)
+  group_number INTEGER NOT NULL CHECK (group_number BETWEEN 1 AND 6),
+  email TEXT
 );
+
+-- unique index on employees.email lives in db.ts migrate(): older DBs get the email
+-- column via ALTER TABLE there, so the index must be created only after that runs
 
 CREATE TABLE IF NOT EXISTS team_seats (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

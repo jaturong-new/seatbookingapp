@@ -38,6 +38,7 @@ export type Employee = {
   team_id: number;
   active: number;
   group_number: number;
+  email: string | null;
 };
 
 export function getFloors(): Floor[] {
@@ -58,6 +59,10 @@ export function getSeatsForFloor(floorId: number): Seat[] {
     .all(floorId) as Seat[];
 }
 
+export function getSeatById(id: number): Seat | undefined {
+  return getDb().prepare(`SELECT * FROM seats WHERE id = ?`).get(id) as Seat | undefined;
+}
+
 export function getTeams(): Team[] {
   return getDb().prepare(`SELECT * FROM teams ORDER BY name`).all() as Team[];
 }
@@ -75,6 +80,70 @@ export function getEmployees(): (Employee & { team_name: string })[] {
        ORDER BY e.name`
     )
     .all() as (Employee & { team_name: string })[];
+}
+
+export function getEmployeeByEmail(email: string): (Employee & { team_name: string }) | undefined {
+  return getDb()
+    .prepare(
+      `SELECT e.*, t.name as team_name FROM employees e JOIN teams t ON t.id = e.team_id
+       WHERE lower(e.email) = lower(?)`
+    )
+    .get(email) as (Employee & { team_name: string }) | undefined;
+}
+
+/** Names still available to claim on first sign-in: active, no email bound yet, and not a fixed-seat lead. */
+export function getUnclaimedEmployees(): (Employee & { team_name: string })[] {
+  return getDb()
+    .prepare(
+      `SELECT e.*, t.name as team_name FROM employees e JOIN teams t ON t.id = e.team_id
+       WHERE e.active = 1 AND e.email IS NULL
+         AND NOT EXISTS (SELECT 1 FROM seats s WHERE s.code = e.name)
+       ORDER BY e.name`
+    )
+    .all() as (Employee & { team_name: string })[];
+}
+
+export type ClaimResult =
+  | { ok: true }
+  | { ok: false; error: "email_taken" | "name_taken" | "not_found" };
+
+/** First-login claim: permanently bind a Google email to an unclaimed employee name. */
+export function claimEmployeeEmail(employeeId: number, email: string): ClaimResult {
+  const db = getDb();
+  const normalized = email.toLowerCase();
+  if (getEmployeeByEmail(normalized)) return { ok: false, error: "email_taken" };
+  const target = db
+    .prepare(
+      `SELECT id, email FROM employees
+       WHERE id = ? AND active = 1
+         AND NOT EXISTS (SELECT 1 FROM seats s WHERE s.code = employees.name)`
+    )
+    .get(employeeId) as { id: number; email: string | null } | undefined;
+  if (!target) return { ok: false, error: "not_found" };
+  if (target.email) return { ok: false, error: "name_taken" };
+  try {
+    const info = db
+      .prepare(`UPDATE employees SET email = ? WHERE id = ? AND email IS NULL`)
+      .run(normalized, employeeId);
+    if (info.changes !== 1) return { ok: false, error: "name_taken" };
+    return { ok: true };
+  } catch (err: any) {
+    if (err.code === "SQLITE_CONSTRAINT_UNIQUE") return { ok: false, error: "email_taken" };
+    throw err;
+  }
+}
+
+/** Admin: set or clear an employee's email binding directly (fix wrong claims). */
+export function setEmployeeEmail(employeeId: number, email: string | null): ClaimResult {
+  try {
+    getDb()
+      .prepare(`UPDATE employees SET email = ? WHERE id = ?`)
+      .run(email ? email.toLowerCase() : null, employeeId);
+    return { ok: true };
+  } catch (err: any) {
+    if (err.code === "SQLITE_CONSTRAINT_UNIQUE") return { ok: false, error: "email_taken" };
+    throw err;
+  }
 }
 
 export function getEmployeeById(id: number): (Employee & { team_name: string }) | undefined {
