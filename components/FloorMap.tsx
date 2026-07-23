@@ -35,7 +35,17 @@ function formatSeatLabel(code: string, source: string): string {
   return code;
 }
 
-export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatVM[]; weekStart: string; floorName?: string }) {
+export default function FloorMap({
+  seats,
+  weekStart,
+  floorName,
+  bookingEnabled = true,
+}: {
+  seats: SeatVM[];
+  weekStart: string;
+  floorName?: string;
+  bookingEnabled?: boolean;
+}) {
   const router = useRouter();
   const employeeId = usePersonIdentity();
   const [pending, setPending] = useState<number | null>(null);
@@ -43,7 +53,7 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
   const [maxWeeks, setMaxWeeks] = useState(5);
   const [numWeeks, setNumWeeks] = useState(1);
 
-  const canBook = !!selected && !selected.employee && selected.source !== "fixed";
+  const canBook = bookingEnabled && !!selected && !selected.employee && selected.source !== "fixed";
 
   useEffect(() => {
     if (!canBook || !employeeId || !selected) return;
@@ -120,6 +130,12 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
         {employeeId && <Legend swatch="ring-2 ring-[#ff8300] bg-white border-slate-200" label="ที่นั่งของฉัน" />}
       </div>
 
+      {!bookingEnabled && (
+        <div className="mb-4 sm:mb-6 rounded-2xl border border-amber-400/30 bg-amber-500/10 px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-amber-200 shadow-lg backdrop-blur-sm w-fit">
+          ⚠️ ระบบจอง/ปล่อยที่นั่งปิดปรับปรุงชั่วคราว — ดูผังที่นั่งได้ตามปกติ
+        </div>
+      )}
+
       <div className="overflow-x-auto pb-8 touch-pan-x">
         <div className="mx-auto w-fit">
           {floorName && (
@@ -128,7 +144,7 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
             </div>
           )}
         <div
-          className="inline-grid gap-2 sm:gap-3.5 p-4 sm:p-10 rounded-[2rem] border border-slate-200/80 shadow-2xl bg-[radial-gradient(rgba(4,164,204,0.12)_1px,transparent_1px)] [background-size:20px_20px] bg-white"
+          className="inline-grid gap-1.5 sm:gap-3 p-2.5 sm:p-8 rounded-xl sm:rounded-[1.6rem] border border-slate-200/80 shadow-2xl bg-[radial-gradient(rgba(4,164,204,0.12)_1px,transparent_1px)] [background-size:20px_20px] bg-white"
           style={{
             gridTemplateRows: `repeat(${rowCount}, var(--seat-cell-h))`,
             gridTemplateColumns: `repeat(${colCount}, var(--seat-cell-w))`,
@@ -250,15 +266,17 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
             return (
               <button
                 key={seat.id}
-                onClick={() => setSelected(seat)}
-                disabled={pending === seat.id}
+                onClick={bookingEnabled ? () => setSelected(seat) : undefined}
+                disabled={pending === seat.id || !bookingEnabled}
                 style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
-                className={`flex h-full w-full flex-col items-center justify-center rounded-lg sm:rounded-2xl border transition-all duration-300 px-1 sm:px-2 text-center text-[10px] sm:text-sm leading-tight ${base} ${
+                className={`flex h-full w-full flex-col items-center justify-center rounded-lg sm:rounded-xl border transition-all duration-300 px-1 sm:px-1.5 text-center text-[10px] sm:text-xs leading-tight ${base} ${
                   isMine ? "ring-2 ring-[#ff8300] shadow-lg shadow-[#ff8300]/40 z-10" : ""
-                } ${pending === seat.id ? "opacity-50 scale-95" : ""}`}
+                } ${pending === seat.id ? "opacity-50 scale-95" : ""} ${
+                  !bookingEnabled ? "cursor-default" : ""
+                }`}
                 title={seat.code}
               >
-                <span className={`font-bold mb-0.5 sm:mb-1 text-xs sm:text-base ${
+                <span className={`font-bold mb-0.5 sm:mb-0.5 text-xs sm:text-sm ${
                   seat.source === 'booked' ? 'text-white' :
                   seat.source === 'auto' ? 'text-[#04a4cc]' :
                   'text-emerald-700'
@@ -299,7 +317,8 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
               )}
             </div>
 
-            {!employeeId && <p className="mb-4 text-sm font-medium text-amber-300 bg-amber-500/10 p-3 rounded-lg border border-amber-500/20">⚠️ โปรดระบุตัวตนด้านบนก่อนจอง/ปล่อยที่นั่ง</p>}
+            {!bookingEnabled && <p className="mb-4 text-sm font-medium text-amber-300 bg-amber-500/10 p-3 rounded-lg border border-amber-500/20">⚠️ ระบบจอง/ปล่อยที่นั่งปิดปรับปรุงชั่วคราว</p>}
+            {bookingEnabled && !employeeId && <p className="mb-4 text-sm font-medium text-amber-300 bg-amber-500/10 p-3 rounded-lg border border-amber-500/20">⚠️ โปรดระบุตัวตนด้านบนก่อนจอง/ปล่อยที่นั่ง</p>}
 
             {employeeId && canBook && (
               <div className="mb-4 rounded-lg bg-[#002f40]/40 p-4 border border-[#04a4cc]/15">
@@ -334,7 +353,7 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
                   จองที่นั่งนี้ ({numWeeks} สัปดาห์)
                 </button>
               )}
-              {employeeId && selected.source === "auto" && selected.employee?.id === employeeId && (
+              {bookingEnabled && employeeId && selected.source === "auto" && selected.employee?.id === employeeId && (
                 <button
                   onClick={() => act(selected.id, "release")}
                   className="rounded-xl bg-rose-500 px-4 py-2.5 font-semibold text-white shadow-md shadow-rose-500/20 transition-all hover:bg-rose-600 hover:shadow-lg focus:ring-4 focus:ring-rose-400/20"
@@ -342,7 +361,7 @@ export default function FloorMap({ seats, weekStart, floorName }: { seats: SeatV
                   ปล่อยที่นั่งนี้ (ไม่เข้าออฟฟิศ)
                 </button>
               )}
-              {employeeId && (
+              {bookingEnabled && employeeId && (
                 ((selected.source === "booked" && selected.employee?.id === employeeId) ||
                  (selected.employee === null && selected.autoEmployee?.id === employeeId))
               ) && (

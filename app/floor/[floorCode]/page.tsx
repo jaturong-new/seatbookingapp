@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getFloorByCode, getFloorAssignments } from "@/lib/queries";
 import { weekStartOf, clampToFirstWeek } from "@/lib/rotation";
+import { BOOKING_ENABLED } from "@/lib/config";
 import WeekNav from "@/components/WeekNav";
 import FloorMap from "@/components/FloorMap";
 import PersonPicker from "@/components/PersonPicker";
@@ -49,7 +50,7 @@ export default function FloorPage({
       </div>
 
       <div className="bg-[#002836]/80 backdrop-blur-md rounded-[1.5rem] p-2.5 sm:p-4 md:p-6 shadow-2xl border border-[#04a4cc]/20">
-        <FloorMap seats={seats} weekStart={weekStart} floorName={`Floor ${floor.code.replace(/^F/i, "")}`} />
+        <FloorMap seats={seats} weekStart={weekStart} floorName={`Floor ${floor.code.replace(/^F/i, "")}`} bookingEnabled={BOOKING_ENABLED} />
       </div>
     </div>
   );

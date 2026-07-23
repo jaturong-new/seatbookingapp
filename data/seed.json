@@ -1446,35 +1446,43 @@
     },
     {
       "name": "สาธิต นวหิรัญกุล",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 2
     },
     {
       "name": "อรพิมพ์ สระกระโทก",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 2
     },
     {
       "name": "เอกรินทร์ แรงสูงเนิน",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 4
     },
     {
       "name": "กนกพร สุขปัญญา",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 3
     },
     {
       "name": "สุทรรศนีย์ ห่วงไธสงค์",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 3
     },
     {
       "name": "ปรียนุช ใจชื้น",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 3
     },
     {
       "name": "กฤตกร ทิมะวงศ์",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 2
     },
     {
       "name": "เยาวเรศ นิ่มเนตร",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 1
     },
     {
       "name": "ดรุฑ จงบรรเจิดเพชร",
@@ -1486,11 +1494,13 @@
     },
     {
       "name": "สุรเชฐ จินทนา",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 1
     },
     {
       "name": "ศรัณยู คำแสง",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 4
     },
     {
       "name": "อาภัสรา โมรัษเฐียร",
@@ -1506,15 +1516,18 @@
     },
     {
       "name": "รุจรวี มีลา",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 4
     },
     {
       "name": "ปุณยา หาสินอนันต์",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 3
     },
     {
       "name": "พรณัฐา ใจประเสริฐ",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 3
     },
     {
       "name": "ธนากร เหรียญรุ่งเรือง",
@@ -1522,7 +1535,8 @@
     },
     {
       "name": "พิธภัณฑ์ ศรีวะรมย์",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 4
     },
     {
       "name": "คมชาญ จันทร์นาค",
@@ -1534,27 +1548,33 @@
     },
     {
       "name": "ศิริภัทร ตุลยกุล",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 2
     },
     {
       "name": "คามิน ด่านคอนสกุล",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 6
     },
     {
       "name": "ธีระเดช ทวีบุญรุ่งเรือง",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 4
     },
     {
       "name": "ปิยะ แก้วเกษ",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 6
     },
     {
       "name": "ภาณุพันธ์ สุขดี",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 1
     },
     {
       "name": "สถาพร ประณิธานวิทยา",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 2
     },
     {
       "name": "สุวิษา สอนแก้ว",
@@ -1562,15 +1582,18 @@
     },
     {
       "name": "ยศวัจน์ หาญเจริญวงศ์",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 5
     },
     {
       "name": "เจนภพ สิทธิโชติ",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 5
     },
     {
       "name": "จาตุรงค์ ทองแดง",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 1
     },
     {
       "name": "โอภาส ตรีนัย",
@@ -1578,7 +1601,8 @@
     },
     {
       "name": "มาโนชญ์ สุวรรณดี",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 1
     },
     {
       "name": "ภูวสิษฏ์ ผลรุ่งเจริญวงษ์",
@@ -1586,15 +1610,18 @@
     },
     {
       "name": "บดินทร์ อิทธิพลชยานันท์",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 6
     },
     {
       "name": "ศุภกิจ สิงห์เวียง",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 6
     },
     {
       "name": "พงศ์ธยศ ไวยวุธ",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 6
     },
     {
       "name": "พีชนก ชูสมบัติ",
@@ -1602,11 +1629,13 @@
     },
     {
       "name": "วราทร เอมบำรุง",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 5
     },
     {
       "name": "ณัฐฐินี ก้อนแหวน",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 5
     },
     {
       "name": "วสันต์ เพียรมาก",
@@ -1614,7 +1643,8 @@
     },
     {
       "name": "ชนกนันท์ นุ่มน้อย",
-      "team_name": "DEV"
+      "team_name": "DEV",
+      "group_number": 5
     },
     {
       "name": "กิตติพงษ์ (ตี๋)",

@@ -20,6 +20,65 @@ function getRealAttendance() {
   return attendanceCache;
 }
 
+type SeatRound = { week_start: string; assignments: Record<string, string> };
+
+let seatRoundsCache:
+  | { weeks: Set<string>; seatCodes: Set<string>; byWeek: Map<string, Map<string, string>>; reverseByWeek: Map<string, Map<string, string>> }
+  | null = null;
+
+/** Real per-person, per-week desk assignment for DEV's rotating pool, sourced from the
+ * "รอบที่นั่ง DEV" sheet (2026-07-23 import, 22 rounds covering 2026-08-03 – 2026-12-28).
+ * This is the *only* place these ~25 F5 desks are assigned to real people; outside its
+ * coverage (employee not in the sheet, or week beyond round 22) callers must fall back to
+ * the synthetic `computeAutoSeat`/`computeAutoOccupants` rotation. */
+function getRealSeatRounds() {
+  if (seatRoundsCache) return seatRoundsCache;
+  const filePath = path.join(process.cwd(), "data", "dev_seat_rounds.json");
+  const data: { rounds: SeatRound[] } = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+
+  const weeks = new Set<string>();
+  const seatCodes = new Set<string>();
+  const byWeek = new Map<string, Map<string, string>>();
+  const reverseByWeek = new Map<string, Map<string, string>>();
+
+  for (const round of data.rounds) {
+    weeks.add(round.week_start);
+    const forward = new Map(Object.entries(round.assignments));
+    byWeek.set(round.week_start, forward);
+    const reverse = new Map<string, string>();
+    for (const [name, code] of forward) {
+      if (code === "WFH") continue;
+      seatCodes.add(code);
+      reverse.set(code, name);
+    }
+    reverseByWeek.set(round.week_start, reverse);
+  }
+
+  seatRoundsCache = { weeks, seatCodes, byWeek, reverseByWeek };
+  return seatRoundsCache;
+}
+
+/** The employee's real assigned desk for this exact week, or "WFH", or undefined if this
+ * employee/week falls outside the real sheet's coverage (caller should use the algorithm instead). */
+function getRealSeatForEmployeeWeek(employeeName: string, weekStart: string): string | undefined {
+  const real = getRealSeatRounds();
+  if (!real.weeks.has(weekStart)) return undefined;
+  return real.byWeek.get(weekStart)?.get(employeeName);
+}
+
+/** The real occupant's employee id for a seat this week: a number if assigned, null if the
+ * seat/week is covered by the real sheet but genuinely open, or undefined if not covered at all. */
+function getRealOccupantId(seat: Seat, weekStart: string): number | null | undefined {
+  const real = getRealSeatRounds();
+  if (!real.weeks.has(weekStart) || !real.seatCodes.has(seat.full_code)) return undefined;
+  const name = real.reverseByWeek.get(weekStart)?.get(seat.full_code);
+  if (!name) return null;
+  const employee = getDb().prepare(`SELECT id FROM employees WHERE name = ? AND active = 1`).get(name) as
+    | { id: number }
+    | undefined;
+  return employee ? employee.id : null;
+}
+
 export type Floor = { id: number; code: string; name: string };
 export type Seat = {
   id: number;
@@ -184,8 +243,16 @@ function getBookingFor(seatId: number, weekStart: string): BookingRow | undefine
 /** Resolve who effectively occupies a seat for a given week: explicit booking wins, then auto-rotation, else open. */
 export function getSeatAssignment(seat: Seat, weekStart: string): SeatAssignment {
   const booking = getBookingFor(seat.id, weekStart);
-  const occupants = computeAutoOccupants(seat.id, weekStart);
-  const autoEmployee = occupants.length > 0 ? (getEmployeeById(occupants[0].id) ?? null) : null;
+  const realOccupantId = getRealOccupantId(seat, weekStart);
+  const autoEmployee =
+    realOccupantId !== undefined
+      ? realOccupantId != null
+        ? getEmployeeById(realOccupantId) ?? null
+        : null
+      : (() => {
+          const occupants = computeAutoOccupants(seat.id, weekStart);
+          return occupants.length > 0 ? getEmployeeById(occupants[0].id) ?? null : null;
+        })();
 
   if (booking?.status === "booked" && booking.employee_id != null) {
     const employee = getEmployeeById(booking.employee_id);
@@ -194,7 +261,7 @@ export function getSeatAssignment(seat: Seat, weekStart: string): SeatAssignment
   if (booking?.status === "released") {
     return { seat, employee: null, source: "open", autoEmployee };
   }
-  if (occupants.length > 0) {
+  if (autoEmployee) {
     return { seat, employee: autoEmployee, source: "auto", autoEmployee };
   }
   
@@ -236,6 +303,21 @@ export function getEmployeeWeekSeat(employeeId: number, weekStart: string): Empl
   // If the employee has a fixed seat (their name is stored in seat.code)
   const fixed = db.prepare(`SELECT * FROM seats WHERE code = ?`).get(employee.name) as Seat | undefined;
   if (fixed) return { ...fixed, source: "fixed" };
+
+  // Real per-week desk data (รอบที่นั่ง DEV sheet) wins over the synthetic rotation when it
+  // covers this employee/week; falls through to the algorithm otherwise.
+  const realAssignment = getRealSeatForEmployeeWeek(employee.name, weekStart);
+  if (realAssignment !== undefined) {
+    if (realAssignment === "WFH") return { source: "wfh" };
+    const seat = db.prepare(`SELECT * FROM seats WHERE full_code = ?`).get(realAssignment) as Seat | undefined;
+    if (seat) {
+      const booking = getBookingFor(seat.id, weekStart);
+      if (booking && !(booking.status === "booked" && booking.employee_id === employeeId)) {
+        return null;
+      }
+      return { ...seat, source: "auto" };
+    }
+  }
 
   if (isGroupWfh(employee.group_number, weekStart)) return { source: "wfh" };
 
@@ -439,6 +521,12 @@ export function getTeamScheduleView(teamId: number, weekStarts: string[]): Sched
     return {
       employee,
       weeks: weekStarts.map((weekStart) => {
+        // รอบที่นั่ง DEV (dev_seat_rounds.json) is the newer, per-desk source of truth —
+        // prefer it over the older dev_attendance.json whenever it covers this employee/week.
+        const realSeat = getRealSeatForEmployeeWeek(employee.name, weekStart);
+        if (realSeat !== undefined) {
+          return { weekStart, wfh: realSeat === "WFH" };
+        }
         const attendingThisWeek = hasRealData ? byWeek.get(weekStart) : undefined;
         const wfh = attendingThisWeek ? !attendingThisWeek.has(employee.name) : isGroupWfh(employee.group_number, weekStart);
         return { weekStart, wfh };

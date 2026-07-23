@@ -27,13 +27,14 @@ body {
 }
 
 :root {
-  --seat-cell-h: 5rem;
-  --seat-cell-w: 7.5rem;
+  /* ~80% of the original desktop size (5rem/7.5rem) */
+  --seat-cell-h: 4rem;
+  --seat-cell-w: 6rem;
 }
 @media (max-width: 640px) {
   :root {
-    --seat-cell-h: 3.5rem;
-    --seat-cell-w: 4.25rem;
+    --seat-cell-h: 3rem;
+    --seat-cell-w: 3.5rem;
   }
 }
 

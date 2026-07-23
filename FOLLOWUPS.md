@@ -7,12 +7,7 @@ Read this before touching `data/dev_attendance.json`, F32 seat data, or the
 
 ## Open questions
 
-- **4 employees with zero coverage in the 42 real rounds**: ดรุฑ จงบรรเจิดเพชร,
-  พีรพัฒน์ กิจพร้อมผล, คมชาญ จันทร์นาค, โอภาส ตรีนัย. They currently fall back
-  to the synthetic group-rotation calc (`isGroupWfh`) for WFH status on the
-  schedule page, since the real sheet never scheduled them a seat in any of the
-  42 rounds. Confirm whether they're legitimately extra/new hires beyond the
-  historical roster, or a data problem.
+_(none open right now — see resolved section below)_
 
 ## Known limitations
 
@@ -58,3 +53,35 @@ Read this before touching `data/dev_attendance.json`, F32 seat data, or the
   `บดินทร์ รินเย็น` → `บดินทร์ อิทธิพลชยานันท์` (his updated surname) in both
   the DB and `data/seed.json`. He now gets real attendance data instead of
   the synthetic fallback.
+- **(2026-07-23) The "4 employees with zero coverage" question above is
+  resolved**: ดรุฑ จงบรรเจิดเพชร, พีรพัฒน์ กิจพร้อมผล, คมชาญ จันทร์นาค,
+  โอภาส ตรีนัย moved off the DEV team to "พี่นก" (confirmed — they show up
+  under that team's column in the "Booking Seat" sheet, not DEV's). Set
+  `active = 0` for all 4 in the live DB (this app only models DEV, so there's
+  no team to move them to — same treatment as the other already-inactive
+  employees). No `data/seed.json` change needed since `active` was never
+  seed-tracked to begin with (seed always inserts `active = 1`; toggling is a
+  runtime admin action, same as how the pre-existing inactive employees
+  — ธนากร เหรียญรุ่งเรือง, พีชนก ชูสมบัติ, ภูวสิษฏ์ ผลรุ่งเจริญวงษ์,
+  รัชชานนท์ บุญจำรูญ — got there).
+- **(2026-07-23) Real per-person group_number import**: `Mobile Office
+  2025-V3 (1).xlsx`'s "รอบที่นั่ง DEV" sheet turned out to hold the *real*
+  per-person group assignment (not just attendance) for the 30 rotating DEV
+  employees — confirmed the DB's previous group_number was synthetic
+  round-robin and disagreed with the real sheet for 26/30 people. Synced
+  `employees.group_number` to match the sheet for all 30 (source of truth
+  per explicit instruction), and mirrored the same values into
+  `data/seed.json` so a fresh reseed reproduces them (previously only the 4
+  fixed-seat leads had explicit `group_number` there — see the limitation
+  below, still true for those 4).
+- **(2026-07-23) Real per-week seat data imported**: added
+  `data/dev_seat_rounds.json`, the same sheet's actual assigned desk per
+  person per week for its 22 covered rounds (2026-08-03 – 2026-12-28, F5 desks
+  only — the 5 "กลุ่ม fix" rows were left out since those people are already
+  handled correctly by the existing fixed-seat mechanism regardless of week).
+  `getEmployeeWeekSeat`/`getSeatAssignment` now prefer this real assignment
+  over the generic `computeAutoSeat` rotation algorithm when both an
+  employee/seat *and* the week fall inside this file's coverage, falling back
+  to the algorithm otherwise (same "real data wins, else synthetic fallback"
+  pattern as `dev_attendance.json`). Worth revisiting once an updated export
+  covering rounds past 2026-12-28 shows up.

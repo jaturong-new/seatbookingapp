@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AUTH_ENABLED, getSessionEmployee } from "@/lib/auth";
+import { BOOKING_ENABLED } from "@/lib/config";
 import { bookSeat, releaseSeat, clearOverride, getSeatById, getSeatAssignment } from "@/lib/queries";
 
 type Body = {
@@ -11,6 +12,10 @@ type Body = {
 };
 
 export async function POST(req: NextRequest) {
+  if (!BOOKING_ENABLED) {
+    return NextResponse.json({ ok: false, error: "booking_disabled" }, { status: 503 });
+  }
+
   const body = (await req.json()) as Body;
   const { action, seatId, weekStart } = body;
 
