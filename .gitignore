@@ -1,8 +1,8 @@
 node_modules/
 .next/
-*.db
 *.db-journal
+*.db-shm
+*.db-wal
 .env*.local
 
-seatbooking.db*
 tsconfig.tsbuildinfo
