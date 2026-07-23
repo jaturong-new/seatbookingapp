@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { usePersonIdentity } from "./PersonPicker";
 
@@ -54,6 +54,43 @@ export default function FloorMap({
   const [numWeeks, setNumWeeks] = useState(1);
 
   const canBook = bookingEnabled && !!selected && !selected.employee && selected.source !== "fixed";
+
+  // Click-and-drag scrolling for the seat map (mouse; touch already scrolls natively via touch-pan-x).
+  // Tracks drag distance so a real click still fires once dragged < 5px — matters once booking
+  // is re-enabled and seats become clickable again.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const dragState = useRef({ dragging: false, startX: 0, startScrollLeft: 0, moved: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+
+  function onDragMouseDown(e: MouseEvent) {
+    const el = scrollRef.current;
+    if (!el) return;
+    dragState.current = { dragging: true, startX: e.pageX, startScrollLeft: el.scrollLeft, moved: 0 };
+    setIsDragging(true);
+  }
+
+  function onDragMouseMove(e: MouseEvent) {
+    const el = scrollRef.current;
+    const state = dragState.current;
+    if (!state.dragging || !el) return;
+    const delta = e.pageX - state.startX;
+    state.moved = Math.max(state.moved, Math.abs(delta));
+    el.scrollLeft = state.startScrollLeft - delta;
+  }
+
+  function endDrag() {
+    dragState.current.dragging = false;
+    setIsDragging(false);
+  }
+
+  function onSeatClickCapture(e: MouseEvent) {
+    // suppress the click that follows a drag (>5px of mouse movement) so dragging past
+    // a seat doesn't accidentally open/toggle it
+    if (dragState.current.moved > 5) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  }
 
   useEffect(() => {
     if (!canBook || !employeeId || !selected) return;
@@ -136,7 +173,15 @@ export default function FloorMap({
         </div>
       )}
 
-      <div className="overflow-x-auto pb-8 touch-pan-x">
+      <div
+        ref={scrollRef}
+        className={`overflow-x-auto pb-8 touch-pan-x select-none ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+        onMouseDown={onDragMouseDown}
+        onMouseMove={onDragMouseMove}
+        onMouseUp={endDrag}
+        onMouseLeave={endDrag}
+        onClickCapture={onSeatClickCapture}
+      >
         <div className="mx-auto w-fit">
           {floorName && (
             <div className="mb-3 sm:mb-5 rounded-2xl bg-gradient-to-r from-[#00222f] via-[#004a63] to-[#00222f] px-4 sm:px-6 py-2.5 sm:py-3.5 text-center text-base sm:text-xl font-extrabold tracking-[0.2em] sm:tracking-[0.3em] text-white shadow-lg border border-cyan-400/25 uppercase">
