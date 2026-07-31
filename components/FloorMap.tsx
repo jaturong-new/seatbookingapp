@@ -12,6 +12,8 @@ type SeatVM = {
   employee: { id: number; name: string; team_name: string } | null;
   source: "booked" | "auto" | "open" | "fixed";
   autoEmployee?: { id: number; name: string; team_name: string } | null;
+  /** Fixed seat whose owner is WFH this week — still theirs, just empty. */
+  fixedWfh?: boolean;
 };
 
 function formatDisplayName(fullName: string): string {
@@ -289,11 +291,19 @@ export default function FloorMap({
                 <div
                   key={seat.id}
                   style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
-                  className="flex h-full w-full flex-col items-center justify-center rounded-2xl border border-amber-300 text-amber-800 bg-gradient-to-br from-amber-50 to-amber-100/80 shadow-sm opacity-90 px-2 text-center text-xs leading-tight select-none cursor-default"
-                  title={`${seat.code} (ที่นั่งประจำ)`}
+                  className={`flex h-full w-full flex-col items-center justify-center rounded-2xl border border-amber-300 text-amber-800 bg-gradient-to-br from-amber-50 to-amber-100/80 shadow-sm px-2 text-center text-xs leading-tight select-none cursor-default ${
+                    seat.fixedWfh ? "opacity-60 border-dashed" : "opacity-90"
+                  }`}
+                  title={
+                    seat.fixedWfh
+                      ? `${seat.code} (ที่นั่งประจำ — สัปดาห์นี้ WFH, กันที่นั่งไว้)`
+                      : `${seat.code} (ที่นั่งประจำ)`
+                  }
                 >
                   <span className="font-semibold mb-0.5 text-amber-700">🔒 {displayLabel}</span>
-                  <span className="truncate w-full font-medium text-amber-600/70">ประจำ</span>
+                  <span className="truncate w-full font-medium text-amber-600/70">
+                    {seat.fixedWfh ? "ประจำ · WFH" : "ประจำ"}
+                  </span>
                 </div>
               );
             }

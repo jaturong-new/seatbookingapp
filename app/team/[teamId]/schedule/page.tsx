@@ -41,7 +41,7 @@ export default function TeamSchedulePage({
             <span className="bg-gradient-to-r from-ocean-500 to-ocean-700 bg-clip-text text-transparent">{team.name}</span>
           </h1>
           <p className="text-slate-500 mt-1.5 font-medium">
-            แสดง {WEEKS_SHOWN} สัปดาห์ เริ่ม {startWeek} — ไม่รวมลีดที่มีที่นั่งประจำ (เข้าทุกสัปดาห์อยู่แล้ว)
+            แสดง {WEEKS_SHOWN} สัปดาห์ เริ่ม {startWeek} — รวมกลุ่มที่นั่งประจำที่มีรอบ WFH ด้วย ไม่รวมลีดที่เข้าทุกสัปดาห์
           </p>
         </div>
         <Link href={`/team/${team.id}`} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-ocean-600 hover:bg-ocean-50 transition-all shrink-0 w-fit">

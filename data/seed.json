@@ -168,7 +168,7 @@
       "floor_code": "F5",
       "row_letter": "E",
       "col_number": 2,
-      "code": "E2",
+      "code": "สุวิษา สอนแก้ว",
       "full_code": "F5-E2",
       "grid_row": 92,
       "grid_col": 2
@@ -1776,11 +1776,6 @@
       "team_name": "DEV",
       "seat_full_code": "F5-D6",
       "pool_order": 16
-    },
-    {
-      "team_name": "DEV",
-      "seat_full_code": "F5-E2",
-      "pool_order": 17
     },
     {
       "team_name": "DEV",

@@ -30,6 +30,7 @@ export default function FloorPage({
     employee: a.employee ? { id: a.employee.id, name: a.employee.name, team_name: a.employee.team_name } : null,
     source: a.source,
     autoEmployee: a.autoEmployee ? { id: a.autoEmployee.id, name: a.autoEmployee.name, team_name: a.autoEmployee.team_name } : null,
+    fixedWfh: a.fixedWfh ?? false,
   }));
 
   return (

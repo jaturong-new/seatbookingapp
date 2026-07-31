@@ -23,7 +23,13 @@ function getRealAttendance() {
 type SeatRound = { week_start: string; assignments: Record<string, string> };
 
 let seatRoundsCache:
-  | { weeks: Set<string>; seatCodes: Set<string>; byWeek: Map<string, Map<string, string>>; reverseByWeek: Map<string, Map<string, string>> }
+  | {
+      weeks: Set<string>;
+      seatCodes: Set<string>;
+      byWeek: Map<string, Map<string, string>>;
+      reverseByWeek: Map<string, Map<string, string>>;
+      fixedWfh: Map<string, Set<string>>;
+    }
   | null = null;
 
 /** Real per-person, per-week desk assignment for DEV's rotating pool, sourced from the
@@ -34,7 +40,9 @@ let seatRoundsCache:
 function getRealSeatRounds() {
   if (seatRoundsCache) return seatRoundsCache;
   const filePath = path.join(process.cwd(), "data", "dev_seat_rounds.json");
-  const data: { rounds: SeatRound[] } = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  const data: { rounds: SeatRound[]; fixed_wfh?: Record<string, string[]> } = JSON.parse(
+    fs.readFileSync(filePath, "utf-8")
+  );
 
   const weeks = new Set<string>();
   const seatCodes = new Set<string>();
@@ -54,8 +62,35 @@ function getRealSeatRounds() {
     reverseByWeek.set(round.week_start, reverse);
   }
 
-  seatRoundsCache = { weeks, seatCodes, byWeek, reverseByWeek };
+  const fixedWfh = new Map(
+    Object.entries(data.fixed_wfh ?? {}).map(([name, wfhWeeks]) => [name, new Set(wfhWeeks)])
+  );
+
+  seatRoundsCache = { weeks, seatCodes, byWeek, reverseByWeek, fixedWfh };
   return seatRoundsCache;
+}
+
+/** Whether a fixed-seat lead is WFH this week per the sheet's "กลุ่ม fix" rows, or undefined if
+ * the sheet doesn't schedule this person (e.g. leads outside DEV's rotation — they always attend).
+ * Their desk stays reserved either way: it's never in a team pool, so nobody takes it while they're out. */
+function getFixedLeadWfh(employeeName: string, weekStart: string): boolean | undefined {
+  const { fixedWfh } = getRealSeatRounds();
+  const wfhWeeks = fixedWfh.get(employeeName);
+  if (!wfhWeeks) return undefined;
+  return wfhWeeks.has(weekStart);
+}
+
+/** Names of fixed-seat leads whose WFH rounds the sheet does schedule — they belong in the
+ * attendance schedule alongside the rotating members, unlike leads who attend every week. */
+function getScheduledFixedLeadNames(): Set<string> {
+  return new Set(getRealSeatRounds().fixedWfh.keys());
+}
+
+/** Whether a permanent desk is reserved under this name (fixed seats store the employee's name in seat.code). */
+function hasFixedSeat(employeeName: string): boolean {
+  return (
+    getDb().prepare(`SELECT 1 FROM seats WHERE code = ? LIMIT 1`).get(employeeName) !== undefined
+  );
 }
 
 /** The employee's real assigned desk for this exact week, or "WFH", or undefined if this
@@ -232,6 +267,8 @@ export type SeatAssignment = {
   employee: (Employee & { team_name: string }) | null;
   source: "booked" | "auto" | "open" | "fixed";
   autoEmployee?: (Employee & { team_name: string }) | null;
+  /** Fixed seat whose owner is WFH this week — still reserved for them, just empty. */
+  fixedWfh?: boolean;
 };
 
 function getBookingFor(seatId: number, weekStart: string): BookingRow | undefined {
@@ -269,7 +306,10 @@ export function getSeatAssignment(seat: Seat, weekStart: string): SeatAssignment
   if (!inPool) {
     const isSeatCode = /^[A-Za-z]+\d+$/.test(seat.code) || /^[Ff]\d+-[A-Za-z]+\d+$/.test(seat.code);
     if (!isSeatCode) {
-      return { seat, employee: null, source: "fixed", autoEmployee };
+      // seat.code is the owner's name on a fixed seat — flag the weeks they're WFH so the map can
+      // say "reserved, owner out" instead of implying they're at the desk.
+      const fixedWfh = getFixedLeadWfh(seat.code, weekStart) === true;
+      return { seat, employee: null, source: "fixed", autoEmployee, fixedWfh };
     }
   }
   
@@ -300,9 +340,14 @@ export function getEmployeeWeekSeat(employeeId: number, weekStart: string): Empl
   const employee = getEmployeeById(employeeId);
   if (!employee) return null;
 
-  // If the employee has a fixed seat (their name is stored in seat.code)
+  // If the employee has a fixed seat (their name is stored in seat.code). A fixed seat isn't the
+  // same as attending every week: the sheet's "กลุ่ม fix" leads still take WFH rounds, and their
+  // desk simply sits empty (reserved) those weeks.
   const fixed = db.prepare(`SELECT * FROM seats WHERE code = ?`).get(employee.name) as Seat | undefined;
-  if (fixed) return { ...fixed, source: "fixed" };
+  if (fixed) {
+    if (getFixedLeadWfh(employee.name, weekStart)) return { source: "wfh" };
+    return { ...fixed, source: "fixed" };
+  }
 
   // Real per-week desk data (รอบที่นั่ง DEV sheet) wins over the synthetic rotation when it
   // covers this employee/week; falls through to the algorithm otherwise.
@@ -499,20 +544,23 @@ export type ScheduleRow = {
 };
 
 /**
- * Which weeks each rotating team member is in-office vs WFH, for a given list of weeks.
- * Excludes fixed-seat leads — they always attend, nothing to plan around. Uses the real
+ * Which weeks each team member is in-office vs WFH, for a given list of weeks. Covers the rotating
+ * members plus the "กลุ่ม fix" leads the sheet schedules WFH rounds for; excludes leads with a fixed
+ * seat and no scheduled rounds — they always attend, nothing to plan around. Uses the real
  * "Booking Seat" round data where available (source of truth); falls back to the synthetic
  * group rotation for weeks/employees that sheet doesn't cover.
  */
 export function getTeamScheduleView(teamId: number, weekStarts: string[]): ScheduleRow[] {
-  const roster = getDb()
-    .prepare(
-      `SELECT * FROM employees
+  const scheduledLeads = getScheduledFixedLeadNames();
+  const roster = (
+    getDb()
+      .prepare(
+        `SELECT * FROM employees
        WHERE team_id = ? AND active = 1
-         AND NOT EXISTS (SELECT 1 FROM seats s WHERE s.code = employees.name)
        ORDER BY name`
-    )
-    .all(teamId) as Employee[];
+      )
+      .all(teamId) as Employee[]
+  ).filter((e) => scheduledLeads.has(e.name) || !hasFixedSeat(e.name));
 
   const { byWeek, knownNames } = getRealAttendance();
 
@@ -521,6 +569,12 @@ export function getTeamScheduleView(teamId: number, weekStarts: string[]): Sched
     return {
       employee,
       weeks: weekStarts.map((weekStart) => {
+        // A fixed-seat lead's own WFH rounds come from the sheet's "กลุ่ม fix" rows, not from the
+        // rotating per-desk assignments (their desk never enters the pool).
+        const leadWfh = getFixedLeadWfh(employee.name, weekStart);
+        if (leadWfh !== undefined) {
+          return { weekStart, wfh: leadWfh };
+        }
         // รอบที่นั่ง DEV (dev_seat_rounds.json) is the newer, per-desk source of truth —
         // prefer it over the older dev_attendance.json whenever it covers this employee/week.
         const realSeat = getRealSeatForEmployeeWeek(employee.name, weekStart);
