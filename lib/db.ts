@@ -1,10 +1,15 @@
-// Forced reload to clear db cache
-delete (global as any).__seatDb;
 import Database from "better-sqlite3";
 import fs from "fs";
 import path from "path";
 
-const DB_PATH = path.join(process.cwd(), "seatbooking.db");
+// SEAT_DB_PATH keeps the database outside the deployed app directory. It matters because
+// `next build` traces seatbooking.db into .next/standalone/, so a deploy that copies the build
+// output over the app would otherwise overwrite live bookings with the build-time snapshot.
+// In Docker point it at a mounted volume (e.g. /data/seatbooking.db); WAL also needs the
+// containing directory to be writable, not just the file.
+const DB_PATH = process.env.SEAT_DB_PATH
+  ? path.resolve(process.env.SEAT_DB_PATH)
+  : path.join(process.cwd(), "seatbooking.db");
 const SCHEMA_PATH = path.join(process.cwd(), "lib", "schema.sql");
 
 declare global {
@@ -24,6 +29,8 @@ function migrate(db: Database.Database) {
 }
 
 function createConnection(): Database.Database {
+  // A freshly mounted volume may not have the directory yet; schema.sql then creates the tables.
+  fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
   const db = new Database(DB_PATH);
   db.pragma("journal_mode = WAL");
   db.pragma("foreign_keys = ON");

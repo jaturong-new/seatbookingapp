@@ -1,0 +1,18 @@
+node_modules
+.next
+.git
+.gitignore
+
+# Never bake secrets into the image — pass them via env_file / -e at run time.
+.env*.local
+
+# WAL sidecars: copying them without a matching database is worse than not copying them at all.
+*.db-shm
+*.db-wal
+*.db-journal
+
+*.pdf
+*.md
+tsconfig.tsbuildinfo
+Dockerfile
+.dockerignore
