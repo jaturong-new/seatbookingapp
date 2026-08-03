@@ -35,6 +35,12 @@ _(none open right now — see resolved section below)_
   seats). There's no automated check that they match — if they ever drift,
   a fresh `npm run seed` after deleting `seatbooking.db*` would reproduce the
   wrong (older) state. Worth spot-checking parity if anything here looks off.
+  **This has already drifted**: `seed.json` still has no `F24` entry at all
+  (predates both today's SA/Scrum/Tester/พี่นก onboarding and the floor 24
+  redraw below), and none of that floor 24 data is captured there either. A
+  fresh reseed from `seed.json` today would reproduce an app missing floor 24
+  entirely. Resyncing `seed.json` for all of today's work is a separate,
+  larger task from the floor 24 redraw — flagging so it isn't lost.
 
 ## What's already resolved (don't re-litigate)
 
@@ -85,3 +91,32 @@ _(none open right now — see resolved section below)_
   to the algorithm otherwise (same "real data wins, else synthetic fallback"
   pattern as `dev_attendance.json`). Worth revisiting once an updated export
   covering rounds past 2026-12-28 shows up.
+- **(2026-08-03) Floor 24 redrawn from the real physical floor plan**: floor 24
+  previously only had the 17 SA/Scrum rotation seats imported earlier today —
+  no AS400/PMO/PM/Infra desks, no fixed-seat leads, and row E was missing
+  entirely (grid_row was an ad-hoc 1-5 sequence with a gap, not real
+  coordinates). Rebuilt from `Mobile Office-V3-20260801.xlsx`'s "ผังที่นั่ง-เริ่ม
+  สค. 2026" sheet (rows 51-75): floor 24 now has 50 seats total, grid_row 1-10
+  (row-letters A-J), matching the real desk layout. Added 5 new SA fixed-seat
+  employees discovered in the sheet who had no `employees` row yet — รสรินทร์
+  เจิ้ง, บรมเศรษฐ์ฉาย ภูรินท์ชินธนโชติ, ธนโชติ ไชยหงษ์, อรรถพร เกษแก้ว, อัครวัฒน์
+  ลี้วัฒธนพงษ์ — same treatment as DEV's fixed leads on F32. AS400/PMO/PM/Infra
+  names (unmodeled departments) are plain static text labels, same as F32's
+  existing unlinked names. Also fixed two bugs surfaced along the way:
+  `F24-D6` was seeded as an orphaned seat (no `team_seats` row, not fixed
+  either — silently rendered as an open bookable seat) and is now correctly
+  fixed to อรรถพร; `F24-G4` had a pre-existing duplicate `team_seats` row
+  assigning it to *both* SA and Scrum (removed the erroneous Scrum one — the
+  sheet colors all of row G as SA). The one-off migration script used
+  (`scripts/redraw-floor24.ts`) was deleted after running against the live DB,
+  same as past one-off fixes in this file.
+- **(2026-08-03) Floor grid spacing tweak**: F24's `grid_row`/`grid_col` were
+  fully dense (no gaps anywhere), so the standalone corridor desks sat flush
+  against the main seat grid and the A/B, C/D, E/F, G/H, I/J row-pairs had no
+  visual aisle between them — added a 1-cell gap at both (corridor column is
+  now `-1`, one row-number gap between each row-pair). F32 went the other way:
+  its `grid_row` used the raw Excel row numbers directly, so gaps up to 4 rows
+  wide (locker/meeting-room/aisle sections) made the floor feel very spread
+  out — capped every gap at 2 to pull it closer together (single-row gaps
+  untouched). Both are pure `grid_row`/`grid_col` renumbers — no seats added,
+  removed, or reassigned. One-off script deleted after running.
