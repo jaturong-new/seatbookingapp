@@ -20,9 +20,11 @@ CREATE TABLE IF NOT EXISTS seats (
   grid_col INTEGER NOT NULL
 );
 
+-- color: hex swatch used to tell teams apart at a glance on the shared floor map (e.g. "#04a4cc")
 CREATE TABLE IF NOT EXISTS teams (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL UNIQUE
+  name TEXT NOT NULL UNIQUE,
+  color TEXT
 );
 
 -- group_number (1-4): the real office policy splits each team into 4 even groups; every week

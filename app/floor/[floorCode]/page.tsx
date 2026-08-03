@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getFloorByCode, getFloorAssignments } from "@/lib/queries";
+import { getFloorByCode, getFloorAssignments, getTeams } from "@/lib/queries";
 import { weekStartOf, clampToFirstWeek } from "@/lib/rotation";
 import { BOOKING_ENABLED } from "@/lib/config";
 import WeekNav from "@/components/WeekNav";
@@ -27,10 +27,16 @@ export default function FloorPage({
     code: a.seat.code,
     grid_row: a.seat.grid_row,
     grid_col: a.seat.grid_col,
-    employee: a.employee ? { id: a.employee.id, name: a.employee.name, team_name: a.employee.team_name } : null,
+    employee: a.employee
+      ? { id: a.employee.id, name: a.employee.name, team_name: a.employee.team_name, team_color: a.employee.team_color }
+      : null,
     source: a.source,
-    autoEmployee: a.autoEmployee ? { id: a.autoEmployee.id, name: a.autoEmployee.name, team_name: a.autoEmployee.team_name } : null,
+    autoEmployee: a.autoEmployee
+      ? { id: a.autoEmployee.id, name: a.autoEmployee.name, team_name: a.autoEmployee.team_name, team_color: a.autoEmployee.team_color }
+      : null,
     fixedWfh: a.fixedWfh ?? false,
+    fixedTeamColor: a.fixedTeamColor ?? null,
+    fixedTeamName: a.fixedTeamName ?? null,
   }));
 
   return (
@@ -51,7 +57,13 @@ export default function FloorPage({
       </div>
 
       <div className="bg-[#002836]/80 backdrop-blur-md rounded-[1.5rem] p-2.5 sm:p-4 md:p-6 shadow-2xl border border-[#04a4cc]/20">
-        <FloorMap seats={seats} weekStart={weekStart} floorName={`Floor ${floor.code.replace(/^F/i, "")}`} bookingEnabled={BOOKING_ENABLED} />
+        <FloorMap
+          seats={seats}
+          weekStart={weekStart}
+          floorName={`Floor ${floor.code.replace(/^F/i, "")}`}
+          bookingEnabled={BOOKING_ENABLED}
+          teams={getTeams()}
+        />
       </div>
     </div>
   );

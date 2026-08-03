@@ -26,6 +26,11 @@ function migrate(db: Database.Database) {
   db.exec(
     `CREATE UNIQUE INDEX IF NOT EXISTS idx_employees_email ON employees(email) WHERE email IS NOT NULL`
   );
+
+  const teamCols = db.prepare(`PRAGMA table_info(teams)`).all() as { name: string }[];
+  if (teamCols.length > 0 && !teamCols.some((c) => c.name === "color")) {
+    db.exec(`ALTER TABLE teams ADD COLUMN color TEXT`);
+  }
 }
 
 function createConnection(): Database.Database {

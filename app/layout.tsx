@@ -1,6 +1,6 @@
 import "./globals.css";
 import Link from "next/link";
-import { getFloors, getTeams } from "@/lib/queries";
+import { getFloors, getStaffedTeams } from "@/lib/queries";
 
 import { Noto_Sans_Thai, Outfit } from "next/font/google";
 
@@ -13,7 +13,7 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const floors = getFloors();
-  const teams = getTeams();
+  const teams = getStaffedTeams();
 
   return (
     <html lang="th">

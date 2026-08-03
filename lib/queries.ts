@@ -32,39 +32,49 @@ let seatRoundsCache:
     }
   | null = null;
 
-/** Real per-person, per-week desk assignment for DEV's rotating pool, sourced from the
- * "รอบที่นั่ง DEV" sheet (2026-07-23 import, 22 rounds covering 2026-08-03 – 2026-12-28).
- * This is the *only* place these ~25 F5 desks are assigned to real people; outside its
- * coverage (employee not in the sheet, or week beyond round 22) callers must fall back to
- * the synthetic `computeAutoSeat`/`computeAutoOccupants` rotation. */
+/** Real per-week desk-round sources, one per team's rotating pool, each sourced from the
+ * "Mobile Office" sheet family (see each file's own `source` field for exact sheet/import date).
+ * Merged together below since a given week_start/seat can come from any of them. */
+const SEAT_ROUNDS_FILES = ["dev_seat_rounds.json", "nok_seat_rounds.json", "tester_seat_rounds.json", "sa_seat_rounds.json"];
+
+/** Real per-person, per-week desk assignment for each team's rotating pool. This is the *only*
+ * place these desks are assigned to real people; outside its coverage (employee not in any
+ * sheet, or week beyond that sheet's last round) callers must fall back to the synthetic
+ * `computeAutoSeat`/`computeAutoOccupants` rotation. */
 function getRealSeatRounds() {
   if (seatRoundsCache) return seatRoundsCache;
-  const filePath = path.join(process.cwd(), "data", "dev_seat_rounds.json");
-  const data: { rounds: SeatRound[]; fixed_wfh?: Record<string, string[]> } = JSON.parse(
-    fs.readFileSync(filePath, "utf-8")
-  );
 
   const weeks = new Set<string>();
   const seatCodes = new Set<string>();
   const byWeek = new Map<string, Map<string, string>>();
   const reverseByWeek = new Map<string, Map<string, string>>();
+  const fixedWfh = new Map<string, Set<string>>();
 
-  for (const round of data.rounds) {
-    weeks.add(round.week_start);
-    const forward = new Map(Object.entries(round.assignments));
-    byWeek.set(round.week_start, forward);
-    const reverse = new Map<string, string>();
-    for (const [name, code] of forward) {
-      if (code === "WFH") continue;
-      seatCodes.add(code);
-      reverse.set(code, name);
+  for (const fileName of SEAT_ROUNDS_FILES) {
+    const filePath = path.join(process.cwd(), "data", fileName);
+    if (!fs.existsSync(filePath)) continue;
+    const data: { rounds: SeatRound[]; fixed_wfh?: Record<string, string[]> } = JSON.parse(
+      fs.readFileSync(filePath, "utf-8")
+    );
+
+    for (const round of data.rounds) {
+      weeks.add(round.week_start);
+      const forward = byWeek.get(round.week_start) ?? new Map<string, string>();
+      const reverse = reverseByWeek.get(round.week_start) ?? new Map<string, string>();
+      for (const [name, code] of Object.entries(round.assignments)) {
+        forward.set(name, code);
+        if (code === "WFH") continue;
+        seatCodes.add(code);
+        reverse.set(code, name);
+      }
+      byWeek.set(round.week_start, forward);
+      reverseByWeek.set(round.week_start, reverse);
     }
-    reverseByWeek.set(round.week_start, reverse);
-  }
 
-  const fixedWfh = new Map(
-    Object.entries(data.fixed_wfh ?? {}).map(([name, wfhWeeks]) => [name, new Set(wfhWeeks)])
-  );
+    for (const [name, wfhWeeks] of Object.entries(data.fixed_wfh ?? {})) {
+      fixedWfh.set(name, new Set(wfhWeeks));
+    }
+  }
 
   seatRoundsCache = { weeks, seatCodes, byWeek, reverseByWeek, fixedWfh };
   return seatRoundsCache;
@@ -125,7 +135,7 @@ export type Seat = {
   grid_row: number;
   grid_col: number;
 };
-export type Team = { id: number; name: string };
+export type Team = { id: number; name: string; color: string | null };
 export type Employee = {
   id: number;
   name: string;
@@ -159,6 +169,16 @@ export function getSeatById(id: number): Seat | undefined {
 
 export function getTeams(): Team[] {
   return getDb().prepare(`SELECT * FROM teams ORDER BY name`).all() as Team[];
+}
+
+/** Teams with at least one employee -- excludes reservation-only teams (e.g. Scrum) that have
+ * no roster yet, since their /team/:id and /team/:id/schedule pages would have nothing to show. */
+export function getStaffedTeams(): Team[] {
+  return getDb()
+    .prepare(
+      `SELECT * FROM teams WHERE id IN (SELECT DISTINCT team_id FROM employees) ORDER BY name`
+    )
+    .all() as Team[];
 }
 
 export function getTeamByName(name: string): Team | undefined {
@@ -240,12 +260,14 @@ export function setEmployeeEmail(employeeId: number, email: string | null): Clai
   }
 }
 
-export function getEmployeeById(id: number): (Employee & { team_name: string }) | undefined {
+export function getEmployeeById(
+  id: number
+): (Employee & { team_name: string; team_color: string | null }) | undefined {
   return getDb()
     .prepare(
-      `SELECT e.*, t.name as team_name FROM employees e JOIN teams t ON t.id = e.team_id WHERE e.id = ?`
+      `SELECT e.*, t.name as team_name, t.color as team_color FROM employees e JOIN teams t ON t.id = e.team_id WHERE e.id = ?`
     )
-    .get(id) as (Employee & { team_name: string }) | undefined;
+    .get(id) as (Employee & { team_name: string; team_color: string | null }) | undefined;
 }
 
 export function getTeamRoster(teamId: number): Employee[] {
@@ -264,11 +286,15 @@ type BookingRow = {
 
 export type SeatAssignment = {
   seat: Seat;
-  employee: (Employee & { team_name: string }) | null;
+  employee: (Employee & { team_name: string; team_color: string | null }) | null;
   source: "booked" | "auto" | "open" | "fixed";
-  autoEmployee?: (Employee & { team_name: string }) | null;
+  autoEmployee?: (Employee & { team_name: string; team_color: string | null }) | null;
   /** Fixed seat whose owner is WFH this week — still reserved for them, just empty. */
   fixedWfh?: boolean;
+  /** Team color for a fixed seat, resolved by matching seat.code to an employee name (if any). */
+  fixedTeamColor?: string | null;
+  /** Set when this "fixed" seat is really an unstaffed team-pool reservation (no roster yet) rather than a named owner's desk. */
+  fixedTeamName?: string;
 };
 
 function getBookingFor(seatId: number, weekStart: string): BookingRow | undefined {
@@ -302,17 +328,39 @@ export function getSeatAssignment(seat: Seat, weekStart: string): SeatAssignment
     return { seat, employee: autoEmployee, source: "auto", autoEmployee };
   }
   
-  const inPool = getDb().prepare(`SELECT 1 FROM team_seats WHERE seat_id = ? LIMIT 1`).get(seat.id);
+  const inPool = getDb()
+    .prepare(
+      `SELECT t.id as team_id, t.name as team_name, t.color as team_color FROM team_seats ts
+       JOIN teams t ON t.id = ts.team_id WHERE ts.seat_id = ? LIMIT 1`
+    )
+    .get(seat.id) as { team_id: number; team_name: string; team_color: string | null } | undefined;
   if (!inPool) {
     const isSeatCode = /^[A-Za-z]+\d+$/.test(seat.code) || /^[Ff]\d+-[A-Za-z]+\d+$/.test(seat.code);
     if (!isSeatCode) {
       // seat.code is the owner's name on a fixed seat — flag the weeks they're WFH so the map can
       // say "reserved, owner out" instead of implying they're at the desk.
       const fixedWfh = getFixedLeadWfh(seat.code, weekStart) === true;
-      return { seat, employee: null, source: "fixed", autoEmployee, fixedWfh };
+      const owner = getDb()
+        .prepare(`SELECT t.color as team_color FROM employees e JOIN teams t ON t.id = e.team_id WHERE e.name = ?`)
+        .get(seat.code) as { team_color: string | null } | undefined;
+      return { seat, employee: null, source: "fixed", autoEmployee, fixedWfh, fixedTeamColor: owner?.team_color ?? null };
+    }
+  } else {
+    // A pool seat whose team has no roster at all (e.g. Scrum, reserved with no names entered yet)
+    // is never actually "open" -- it's just unstaffed. Show it as reserved for that team, not bookable.
+    const hasMembers = getDb().prepare(`SELECT 1 FROM employees WHERE team_id = ? LIMIT 1`).get(inPool.team_id);
+    if (!hasMembers) {
+      return {
+        seat,
+        employee: null,
+        source: "fixed",
+        autoEmployee,
+        fixedTeamColor: inPool.team_color,
+        fixedTeamName: inPool.team_name,
+      };
     }
   }
-  
+
   return { seat, employee: null, source: "open", autoEmployee };
 }
 

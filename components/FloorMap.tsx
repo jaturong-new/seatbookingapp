@@ -9,11 +9,13 @@ type SeatVM = {
   code: string;
   grid_row: number;
   grid_col: number;
-  employee: { id: number; name: string; team_name: string } | null;
+  employee: { id: number; name: string; team_name: string; team_color: string | null } | null;
   source: "booked" | "auto" | "open" | "fixed";
-  autoEmployee?: { id: number; name: string; team_name: string } | null;
+  autoEmployee?: { id: number; name: string; team_name: string; team_color: string | null } | null;
   /** Fixed seat whose owner is WFH this week — still theirs, just empty. */
   fixedWfh?: boolean;
+  fixedTeamColor?: string | null;
+  fixedTeamName?: string | null;
 };
 
 function formatDisplayName(fullName: string): string {
@@ -42,11 +44,13 @@ export default function FloorMap({
   weekStart,
   floorName,
   bookingEnabled = true,
+  teams = [],
 }: {
   seats: SeatVM[];
   weekStart: string;
   floorName?: string;
   bookingEnabled?: boolean;
+  teams?: { name: string; color: string | null }[];
 }) {
   const router = useRouter();
   const employeeId = usePersonIdentity();
@@ -167,6 +171,12 @@ export default function FloorMap({
         <Legend swatch="bg-gradient-to-br from-[#44bbdb] to-[#04a4cc] border-[#04a4cc]" label="จองเอง (booked)" />
         <Legend swatch="bg-gradient-to-br from-amber-100 to-amber-200 border-amber-300" label="ที่นั่งประจำ (fixed)" />
         {employeeId && <Legend swatch="ring-2 ring-[#ff8300] bg-white border-slate-200" label="ที่นั่งของฉัน" />}
+        {teams.filter((t) => t.color).map((t) => (
+          <div key={t.name} className="flex items-center gap-2">
+            <span className="inline-block h-3 w-3 rounded-full border border-black/10" style={{ backgroundColor: t.color! }} />
+            <span className="text-cyan-200/70">ทีม{t.name}</span>
+          </div>
+        ))}
       </div>
 
       {!bookingEnabled && (
@@ -254,19 +264,6 @@ export default function FloorMap({
               );
             }
 
-            if (seat.code.toLowerCase().startsWith("ext")) {
-              return (
-                <div
-                  key={seat.id}
-                  style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
-                  className="flex h-full w-full flex-col items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-600 shadow-sm font-medium text-xs leading-tight select-none cursor-default"
-                  title={seat.code}
-                >
-                  <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-0.5">EXT</span>
-                  <span className="font-bold text-slate-700 text-[10px]">{seat.code.replace(/ext\.?/i, "").trim()}</span>
-                </div>
-              );
-            }
             if (seat.code === "ไม่มีที่นั่ง") {
               return (
                 <div
@@ -290,19 +287,25 @@ export default function FloorMap({
               return (
                 <div
                   key={seat.id}
-                  style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
+                  style={{
+                    gridRow: seat.grid_row - minRow + 1,
+                    gridColumn: seat.grid_col - minCol + 1,
+                    ...(seat.fixedTeamColor ? { borderLeftColor: seat.fixedTeamColor, borderLeftWidth: 4 } : {}),
+                  }}
                   className={`flex h-full w-full flex-col items-center justify-center rounded-2xl border border-amber-300 text-amber-800 bg-gradient-to-br from-amber-50 to-amber-100/80 shadow-sm px-2 text-center text-xs leading-tight select-none cursor-default ${
                     seat.fixedWfh ? "opacity-60 border-dashed" : "opacity-90"
                   }`}
                   title={
-                    seat.fixedWfh
+                    seat.fixedTeamName
+                      ? `${seat.code} (จองไว้ให้ทีม${seat.fixedTeamName})`
+                      : seat.fixedWfh
                       ? `${seat.code} (ที่นั่งประจำ — สัปดาห์นี้ WFH, กันที่นั่งไว้)`
                       : `${seat.code} (ที่นั่งประจำ)`
                   }
                 >
                   <span className="font-semibold mb-0.5 text-amber-700">🔒 {displayLabel}</span>
                   <span className="truncate w-full font-medium text-amber-600/70">
-                    {seat.fixedWfh ? "ประจำ · WFH" : "ประจำ"}
+                    {seat.fixedTeamName ? `ทีม${seat.fixedTeamName}` : seat.fixedWfh ? "ประจำ · WFH" : "ประจำ"}
                   </span>
                 </div>
               );
@@ -317,19 +320,24 @@ export default function FloorMap({
                 : "bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm hover:bg-emerald-100 hover:border-emerald-400 hover:-translate-y-1";
 
             const employeeName = seat.employee ? formatDisplayName(seat.employee.name) : "ว่าง";
+            const teamColor = seat.employee?.team_color ?? null;
 
             return (
               <button
                 key={seat.id}
                 onClick={bookingEnabled ? () => setSelected(seat) : undefined}
                 disabled={pending === seat.id || !bookingEnabled}
-                style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
+                style={{
+                  gridRow: seat.grid_row - minRow + 1,
+                  gridColumn: seat.grid_col - minCol + 1,
+                  ...(teamColor ? { borderLeftColor: teamColor, borderLeftWidth: 4 } : {}),
+                }}
                 className={`flex h-full w-full flex-col items-center justify-center rounded-lg sm:rounded-xl border transition-all duration-300 px-1 sm:px-1.5 text-center text-[10px] sm:text-xs leading-tight ${base} ${
                   isMine ? "ring-2 ring-[#ff8300] shadow-lg shadow-[#ff8300]/40 z-10" : ""
                 } ${pending === seat.id ? "opacity-50 scale-95" : ""} ${
                   !bookingEnabled ? "cursor-default" : ""
                 }`}
-                title={seat.code}
+                title={`${seat.code}${seat.employee ? ` — ทีม${seat.employee.team_name}` : ""}`}
               >
                 <span className={`font-bold mb-0.5 sm:mb-0.5 text-xs sm:text-sm ${
                   seat.source === 'booked' ? 'text-white' :
@@ -360,7 +368,15 @@ export default function FloorMap({
               ) : selected.employee ? (
                 <>
                   <p className="font-semibold text-white text-lg mb-1">{selected.employee.name}</p>
-                  <p className="text-sm text-cyan-200/60 mb-2">ทีม: {selected.employee.team_name}</p>
+                  <p className="text-sm text-cyan-200/60 mb-2 flex items-center gap-1.5">
+                    ทีม: {selected.employee.team_name}
+                    {selected.employee.team_color && (
+                      <span
+                        className="inline-block h-2.5 w-2.5 rounded-full border border-white/20"
+                        style={{ backgroundColor: selected.employee.team_color }}
+                      />
+                    )}
+                  </p>
                   <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
                     selected.source === "booked" ? "bg-[#04a4cc]/20 text-[#44bbdb] border border-[#04a4cc]/30" : "bg-[#c1c8ab]/20 text-[#c1c8ab] border border-[#c1c8ab]/30"
                   }`}>
