@@ -57,10 +57,10 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-# Hits a route that actually reads the database, so a broken/unwritable volume fails the check
-# instead of passing on a static page.
+# /api/health reads the database but stays outside the login gate (the healthcheck has no
+# session cookie) -- /api/employees no longer works here since it now requires sign-in.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD node -e "require('http').get({host:'127.0.0.1',port:process.env.PORT||3000,path:'/api/employees'},r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+    CMD node -e "require('http').get({host:'127.0.0.1',port:process.env.PORT||3000,path:'/api/health'},r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["node", "server.js"]
