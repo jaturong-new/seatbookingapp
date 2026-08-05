@@ -10,7 +10,14 @@ export type EmployeeOption = { id: number; name: string; team_name: string };
 export type Me =
   | { authEnabled: false }
   | { authEnabled: true; signedIn: false }
-  | { authEnabled: true; signedIn: true; email: string; employee: EmployeeOption | null; unclaimed?: EmployeeOption[] };
+  | {
+      authEnabled: true;
+      signedIn: true;
+      email: string;
+      name?: string | null;
+      employee: EmployeeOption | null;
+      unclaimed?: EmployeeOption[];
+    };
 
 // ── legacy localStorage identity (used only when auth is disabled) ──────────
 

@@ -3,15 +3,19 @@ import { notFound } from "next/navigation";
 import { getDb } from "@/lib/db";
 import { getTeamWeekView } from "@/lib/queries";
 import { weekStartOf, clampToFirstWeek } from "@/lib/rotation";
+import { hasReadAccess } from "@/lib/auth";
 import WeekNav from "@/components/WeekNav";
+import LoginGate from "@/components/LoginGate";
 
-export default function TeamPage({
+export default async function TeamPage({
   params,
   searchParams,
 }: {
   params: { teamId: string };
   searchParams: { week?: string };
 }) {
+  if (!(await hasReadAccess())) return <LoginGate />;
+
   const teamId = Number(params.teamId);
   const team = getDb().prepare(`SELECT * FROM teams WHERE id = ?`).get(teamId) as
     | { id: number; name: string }

@@ -2,8 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getEmployeeById, getEmployeeWeekSeat } from "@/lib/queries";
 import { weekStartOf, clampToFirstWeek } from "@/lib/rotation";
+import { hasReadAccess } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
+  if (!(await hasReadAccess())) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
   const employeeId = Number(req.nextUrl.searchParams.get("employeeId"));
   const week = clampToFirstWeek(req.nextUrl.searchParams.get("week") ?? weekStartOf(new Date()));
 

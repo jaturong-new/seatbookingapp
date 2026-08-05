@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { getDb } from "@/lib/db";
 import { getTeamScheduleView } from "@/lib/queries";
 import { addWeeks, clampToFirstWeek, FIRST_BOOKABLE_WEEK } from "@/lib/rotation";
+import { hasReadAccess } from "@/lib/auth";
+import LoginGate from "@/components/LoginGate";
 
 const WEEKS_SHOWN = 12;
 
@@ -11,13 +13,15 @@ function formatShort(weekStart: string): string {
   return `${d}/${m}`;
 }
 
-export default function TeamSchedulePage({
+export default async function TeamSchedulePage({
   params,
   searchParams,
 }: {
   params: { teamId: string };
   searchParams: { start?: string };
 }) {
+  if (!(await hasReadAccess())) return <LoginGate />;
+
   const teamId = Number(params.teamId);
   const team = getDb().prepare(`SELECT * FROM teams WHERE id = ?`).get(teamId) as
     | { id: number; name: string }

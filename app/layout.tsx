@@ -1,6 +1,9 @@
 import "./globals.css";
 import Link from "next/link";
 import { getFloors, getStaffedTeams } from "@/lib/queries";
+import { hasReadAccess } from "@/lib/auth";
+import PersonPicker from "@/components/PersonPicker";
+import NavMenu from "@/components/NavMenu";
 
 import { Noto_Sans_Thai, Outfit } from "next/font/google";
 
@@ -11,9 +14,12 @@ export const metadata = {
   title: "จองที่นั่ง Mobile Office",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const floors = getFloors();
-  const teams = getStaffedTeams();
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Nothing about floors/teams shows in the nav until signed in — the page body itself is
+  // gated per-route (see LoginGate), but the nav links would leak team/floor names too.
+  const signedIn = await hasReadAccess();
+  const floors = signedIn ? getFloors() : [];
+  const teams = signedIn ? getStaffedTeams() : [];
 
   return (
     <html lang="th">
@@ -25,39 +31,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               Mobile Office
             </Link>
 
-            <div className="flex items-center gap-4 sm:gap-8 overflow-x-auto sm:overflow-visible flex-nowrap sm:flex-wrap [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden -mx-3 px-3 sm:mx-0 sm:px-0">
-              <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium shrink-0">
-                <span className="text-cyan-200/60 mr-1 sm:mr-2 text-[10px] sm:text-xs uppercase tracking-wider whitespace-nowrap">ผังชั้น</span>
-                {floors.map((f) => (
-                  <Link key={f.code} href={`/floor/${f.code}`} className="rounded-full px-2.5 sm:px-3 py-1 sm:py-1.5 text-cyan-100 transition-all hover:bg-[#04a4cc]/15 hover:text-white whitespace-nowrap">
-                    {f.name}
-                  </Link>
-                ))}
-              </nav>
+            {signedIn && (
+              <div className="flex items-center gap-1 sm:gap-2">
+                <NavMenu label="ผังชั้น" items={floors.map((f) => ({ href: `/floor/${f.code}`, label: f.name }))} />
+                <NavMenu label="ทีม" items={teams.map((t) => ({ href: `/team/${t.id}`, label: t.name }))} />
+                <NavMenu label="ตารางเข้า" items={teams.map((t) => ({ href: `/team/${t.id}/schedule`, label: t.name }))} />
+              </div>
+            )}
 
-              <div className="h-5 w-px bg-[#04a4cc]/20 hidden md:block shrink-0"></div>
-
-              <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium shrink-0">
-                <span className="text-cyan-200/60 mr-1 sm:mr-2 text-[10px] sm:text-xs uppercase tracking-wider whitespace-nowrap">ทีม</span>
-                {teams.map((t) => (
-                  <Link key={t.id} href={`/team/${t.id}`} className="rounded-full border border-[#04a4cc]/30 bg-[#04a4cc]/10 px-2.5 sm:px-3 py-1 sm:py-1.5 text-cyan-100 transition-all hover:bg-[#04a4cc]/25 hover:border-[#04a4cc]/50 hover:text-white whitespace-nowrap">
-                    {t.name}
-                  </Link>
-                ))}
-              </nav>
-
-              <div className="h-5 w-px bg-[#04a4cc]/20 hidden md:block shrink-0"></div>
-
-              <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium shrink-0">
-                <span className="text-cyan-200/60 mr-1 sm:mr-2 text-[10px] sm:text-xs uppercase tracking-wider whitespace-nowrap">ตารางเข้า</span>
-                {teams.map((t) => (
-                  <Link key={t.id} href={`/team/${t.id}/schedule`} className="rounded-full border border-[#04a4cc]/30 bg-[#04a4cc]/10 px-2.5 sm:px-3 py-1 sm:py-1.5 text-cyan-100 transition-all hover:bg-[#04a4cc]/25 hover:border-[#04a4cc]/50 hover:text-white whitespace-nowrap">
-                    {t.name}
-                  </Link>
-                ))}
-              </nav>
+            <div className="shrink-0">
+              <PersonPicker />
             </div>
-
           </div>
         </header>
         <main className="mx-auto max-w-[98vw] px-3 sm:px-6 py-3 sm:py-4 animate-fade-in-up">

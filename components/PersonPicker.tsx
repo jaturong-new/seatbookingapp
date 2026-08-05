@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { signIn, signOut } from "next-auth/react";
 import {
   fetchMe,
-  invalidateMe,
   getStoredEmployeeId,
   setStoredEmployeeId,
   IDENTITY_EVENT,
@@ -67,6 +66,35 @@ function GoogleIcon() {
   );
 }
 
+function Avatar({ label }: { label: string }) {
+  return (
+    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#44bbdb] to-[#04a4cc] text-xs font-bold text-white">
+      {label.slice(0, 1).toUpperCase()}
+    </span>
+  );
+}
+
+function ChevronDown({ open }: { open: boolean }) {
+  return (
+    <svg
+      className={`w-3.5 h-3.5 shrink-0 text-cyan-200/50 transition-transform ${open ? "rotate-180" : ""}`}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    </svg>
+  );
+}
+
+/** Google Workspace display names are sometimes "English Name - ไทย ชื่อ" -- prefer the Thai
+ * segment since employee records are always Thai names. */
+function extractThaiName(fullName: string): string {
+  const parts = fullName.split(/\s*-\s*/);
+  const thaiPart = parts.find((p) => /[฀-๿]/.test(p));
+  return (thaiPart ?? fullName).trim();
+}
+
 /** Legacy picker (auth disabled): freely select any active name, stored in localStorage. */
 function LegacyPicker() {
   const [employees, setEmployees] = useState<EmployeeOption[]>([]);
@@ -103,39 +131,38 @@ function LegacyPicker() {
   );
 }
 
-export default function PersonPicker() {
-  const { me, refresh } = useMe();
-  const [selectedId, setSelectedId] = useState<number | "">("");
-  const [claiming, setClaiming] = useState(false);
-  const [claimError, setClaimError] = useState<string | null>(null);
+/** Dropdown panel shell: the trigger button plus a floating card, closed by clicking outside. */
+function AccountMenu({
+  trigger,
+  children,
+  open,
+  setOpen,
+}: {
+  trigger: React.ReactNode;
+  children: React.ReactNode;
+  open: boolean;
+  setOpen: (v: boolean) => void;
+}) {
+  return (
+    <div className="relative">
+      <button onClick={() => setOpen(!open)} className={`${pillClass(true)} cursor-pointer hover:bg-[#003a4d]/80`}>
+        {trigger}
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 z-50 mt-2 w-72 max-w-[90vw] rounded-2xl border border-[#04a4cc]/25 bg-[#00222f] p-4 shadow-2xl">
+            {children}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
-  async function claim() {
-    if (!selectedId) return;
-    setClaiming(true);
-    setClaimError(null);
-    try {
-      const res = await fetch("/api/claim", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ employeeId: selectedId }),
-      });
-      const data = await res.json();
-      if (!data.ok) {
-        setClaimError(
-          data.error === "name_taken"
-            ? "ชื่อนี้ถูกผูกกับ email อื่นไปแล้ว"
-            : data.error === "email_taken" || data.error === "already_claimed"
-            ? "email ของคุณถูกผูกกับชื่ออื่นไปแล้ว"
-            : "ทำรายการไม่สำเร็จ ลองใหม่อีกครั้ง"
-        );
-        return;
-      }
-      invalidateMe();
-      refresh();
-    } finally {
-      setClaiming(false);
-    }
-  }
+export default function PersonPicker() {
+  const { me } = useMe();
+  const [open, setOpen] = useState(false);
 
   // loading
   if (!me) {
@@ -161,56 +188,65 @@ export default function PersonPicker() {
     );
   }
 
-  // signed in, not yet mapped to a name → one-time claim
+  // signed in, not yet mapped to a name — display only for now (claim picker disabled, see below)
   if (!me.employee) {
-    const options: EmployeeOption[] = me.unclaimed ?? [];
+    const displayName = me.name ? extractThaiName(me.name) : me.email;
     return (
-      <div className="flex flex-col gap-1 max-w-full">
-        <div className={pillClass(false)}>
-          <span className="shrink-0 whitespace-nowrap text-xs sm:text-sm font-medium text-amber-300">ครั้งแรก — เลือกชื่อของคุณ:</span>
-          <select
-            className="min-w-0 flex-1 bg-transparent text-xs sm:text-sm font-semibold text-white outline-none cursor-pointer"
-            value={selectedId}
-            onChange={(e) => setSelectedId(e.target.value ? Number(e.target.value) : "")}
-          >
-            <option value="" className="bg-[#00222f] text-cyan-200/60">-- เลือกชื่อ --</option>
-            {options.map((e) => (
-              <option key={e.id} value={e.id} className="bg-[#00222f] text-white">
-                {e.name} ({e.team_name})
-              </option>
-            ))}
-          </select>
+      <AccountMenu
+        open={open}
+        setOpen={setOpen}
+        trigger={
+          <>
+            <Avatar label={displayName} />
+            <span className="min-w-0 truncate text-xs sm:text-sm font-semibold text-white">{displayName}</span>
+            <ChevronDown open={open} />
+          </>
+        }
+      >
+        <p className="truncate text-sm font-semibold text-white">{displayName}</p>
+        <p className="mt-0.5 truncate text-[11px] text-cyan-200/40" title={me.email}>
+          {me.email}
+        </p>
+        <div className="mt-3 border-t border-[#04a4cc]/15 pt-3">
           <button
-            onClick={claim}
-            disabled={!selectedId || claiming}
-            className="shrink-0 rounded-full bg-[#04a4cc] px-3 py-1 text-xs sm:text-sm font-semibold text-white disabled:opacity-40 hover:bg-[#44bbdb] transition-colors"
+            onClick={() => signOut()}
+            className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-rose-300 hover:bg-rose-500/10 transition-colors"
           >
-            {claiming ? "กำลังผูก..." : "ยืนยัน"}
+            ออกจากระบบ
           </button>
         </div>
-        <p className="text-[10px] sm:text-xs text-amber-300/80 px-3">
-          {claimError ?? `จะผูกชื่อกับ ${me.email} ถาวร — เลือกได้ครั้งเดียว (แก้ได้โดย admin)`}
-        </p>
-      </div>
+      </AccountMenu>
     );
   }
 
   // signed in + mapped
   return (
-    <div className={pillClass(true)}>
-      <svg className="w-4 h-4 shrink-0 text-cyan-300/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-      </svg>
-      <span className="min-w-0 truncate text-xs sm:text-sm font-semibold text-white" title={me.email}>
-        {me.employee.name} <span className="text-cyan-200/60 font-normal">({me.employee.team_name})</span>
-      </span>
-      <button
-        onClick={() => signOut()}
-        className="shrink-0 whitespace-nowrap text-[10px] sm:text-xs font-medium text-cyan-200/50 hover:text-rose-300 transition-colors"
-        title={`ออกจากระบบ (${me.email})`}
-      >
-        ออกจากระบบ
-      </button>
-    </div>
+    <AccountMenu
+      open={open}
+      setOpen={setOpen}
+      trigger={
+        <>
+          <Avatar label={me.employee.name} />
+          <span className="min-w-0 truncate text-xs sm:text-sm font-semibold text-white">{me.employee.name}</span>
+          <ChevronDown open={open} />
+        </>
+      }
+    >
+      <p className="truncate text-sm font-semibold text-white" title={me.email}>
+        {me.employee.name}
+      </p>
+      <p className="mt-0.5 text-xs text-cyan-200/60">ทีม {me.employee.team_name}</p>
+      <p className="mt-0.5 truncate text-[11px] text-cyan-200/40" title={me.email}>
+        {me.email}
+      </p>
+      <div className="mt-3 border-t border-[#04a4cc]/15 pt-3">
+        <button
+          onClick={() => signOut()}
+          className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-rose-300 hover:bg-rose-500/10 transition-colors"
+        >
+          ออกจากระบบ
+        </button>
+      </div>
+    </AccountMenu>
   );
 }

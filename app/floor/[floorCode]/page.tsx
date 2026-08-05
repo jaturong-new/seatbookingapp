@@ -2,20 +2,23 @@ import { notFound } from "next/navigation";
 import { getFloorByCode, getFloorAssignments, getTeams } from "@/lib/queries";
 import { weekStartOf, clampToFirstWeek } from "@/lib/rotation";
 import { BOOKING_ENABLED } from "@/lib/config";
+import { hasReadAccess } from "@/lib/auth";
 import WeekNav from "@/components/WeekNav";
 import FloorMap from "@/components/FloorMap";
-import PersonPicker from "@/components/PersonPicker";
+import LoginGate from "@/components/LoginGate";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default function FloorPage({
+export default async function FloorPage({
   params,
   searchParams,
 }: {
   params: { floorCode: string };
   searchParams: { week?: string };
 }) {
+  if (!(await hasReadAccess())) return <LoginGate />;
+
   const floor = getFloorByCode(params.floorCode);
   if (!floor) notFound();
 
@@ -51,7 +54,6 @@ export default function FloorPage({
           </h1>
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <WeekNav basePath={`/floor/${floor.code}`} weekStart={weekStart} />
-            <PersonPicker />
           </div>
         </div>
       </div>
