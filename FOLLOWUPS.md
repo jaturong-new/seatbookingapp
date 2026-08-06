@@ -120,3 +120,18 @@ _(none open right now — see resolved section below)_
   out — capped every gap at 2 to pull it closer together (single-row gaps
   untouched). Both are pure `grid_row`/`grid_col` renumbers — no seats added,
   removed, or reassigned. One-off script deleted after running.
+- **(2026-08-06) Management desks on the floor map (`seats.rank`)**: fixed-name
+  desks belonging to management now render as their own slate card with a brass
+  nameplate instead of the plain amber fixed-desk card. `rank` has two values:
+  `executive_office` = walled private room, drawn with a gold frame (พี่บังอร on
+  F24, ปรีชาชาญ (ป้อง) on F24, เฉลิมพงษ์ (ปุ๊) on F32) and `executive` = management
+  desk out on the floor, one flat style (กิตติพงษ์ (ตี๋) + สุลัดดา (อ้อ) on F5;
+  ศรินญา (นุ่น), สมชาย (โตน), รสรินทร์ (เชอรี่) on F24; นุสรา (นก), วโรฒน์ (แบงค์),
+  ทัศนกมล (โบ), วีรพงศ์ (กร) on F32). The cards show **names only** by request.
+  The real org hierarchy behind them is intentionally *not* in the DB, since
+  nothing displays it — recorded here instead so it isn't lost: พี่บังอร is the
+  most senior, เฉลิมพงษ์ (ปุ๊) is second; ผอ. = กิตติพงษ์, ศรินญา, สมชาย, ปรีชาชาญ;
+  รองผอ. = สุลัดดา, รสรินทร์, นุสรา, วโรฒน์, ทัศนกมล, วีรพงศ์. If tier labels are
+  ever wanted on the map, that list is the source to re-derive them from.
+  Floor 32's ten locker placards were also deleted in the same pass (unused —
+  no `team_seats`/`bookings` referenced them).

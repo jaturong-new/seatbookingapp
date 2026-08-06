@@ -31,6 +31,13 @@ function migrate(db: Database.Database) {
   if (teamCols.length > 0 && !teamCols.some((c) => c.name === "color")) {
     db.exec(`ALTER TABLE teams ADD COLUMN color TEXT`);
   }
+
+  // ALTER TABLE can't add the CHECK constraint schema.sql declares for fresh DBs; the values
+  // are only ever written by hand, so an unconstrained column here is close enough.
+  const seatCols = db.prepare(`PRAGMA table_info(seats)`).all() as { name: string }[];
+  if (seatCols.length > 0 && !seatCols.some((c) => c.name === "rank")) {
+    db.exec(`ALTER TABLE seats ADD COLUMN rank TEXT`);
+  }
 }
 
 function createConnection(): Database.Database {

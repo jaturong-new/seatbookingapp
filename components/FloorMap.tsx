@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import { usePersonIdentity } from "./PersonPicker";
 
+type SeatRank = "executive_office" | "executive";
+
 type SeatVM = {
   id: number;
   code: string;
@@ -16,6 +18,23 @@ type SeatVM = {
   fixedWfh?: boolean;
   fixedTeamColor?: string | null;
   fixedTeamName?: string | null;
+  /** Management desk marker — drives the executive card instead of a plain desk. */
+  rank?: SeatRank | null;
+};
+
+/** Management desks: a deep slate card with a brass nameplate, showing the name only.
+ * "executive_office" adds the walled-room frame; the rest share one flat treatment. */
+const RANK_STYLE: Record<SeatRank, { room: string; plate: string; name: string }> = {
+  executive_office: {
+    room: "border-2 border-amber-300 bg-gradient-to-br from-[#243b55] via-[#1b2a41] to-[#243b55] ring-2 ring-amber-300/45 ring-offset-1 ring-offset-white",
+    plate: "bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300",
+    name: "text-amber-50",
+  },
+  executive: {
+    room: "border border-[#44bbdb]/55 bg-gradient-to-br from-[#26485c] via-[#1d3a4c] to-[#26485c]",
+    plate: "bg-gradient-to-r from-[#44bbdb] via-cyan-200 to-[#44bbdb]",
+    name: "text-cyan-50",
+  },
 };
 
 function formatDisplayName(fullName: string): string {
@@ -26,6 +45,29 @@ function formatDisplayName(fullName: string): string {
   name = name.replace(/^[A-Za-z0-9\s]+:\s*/, "");
   // Take the first name (before space)
   return name.split(/\s+/)[0];
+}
+
+/** A little desk monitor, filled when someone's actually sitting there, outlined when the desk
+ * is just waiting empty -- the one bit of "real office" texture the seat buttons get. */
+function DeskIcon({ occupied }: { occupied: boolean }) {
+  return (
+    <svg
+      width="15"
+      height="15"
+      viewBox="0 0 24 24"
+      fill={occupied ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth={occupied ? 1 : 2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={occupied ? "opacity-90" : "opacity-40"}
+      aria-hidden
+    >
+      <rect x="3" y="4" width="18" height="12" rx="1.5" />
+      <line x1="8" y1="20" x2="16" y2="20" />
+      <line x1="12" y1="16" x2="12" y2="20" />
+    </svg>
+  );
 }
 
 function formatSeatLabel(code: string, source: string): string {
@@ -171,6 +213,13 @@ export default function FloorMap({
         <Legend swatch="bg-[#c1c8ab]/30 border-[#c1c8ab]" label="หมุนเวียน (auto)" />
         <Legend swatch="bg-gradient-to-br from-[#44bbdb] to-[#04a4cc] border-[#04a4cc]" label="จองเอง (booked)" />
         <Legend swatch="bg-gradient-to-br from-amber-100 to-amber-200 border-amber-300" label="ที่นั่งประจำ (fixed)" />
+        {/* only surface these on floors that actually have management desks */}
+        {seats.some((s) => s.rank === "executive") && (
+          <Legend swatch="bg-gradient-to-br from-[#26485c] to-[#1d3a4c] border-[#44bbdb]/55" label="ผู้บริหาร" />
+        )}
+        {seats.some((s) => s.rank === "executive_office") && (
+          <Legend swatch="bg-gradient-to-br from-[#243b55] to-[#1b2a41] border-amber-300" label="ห้องส่วนตัว" />
+        )}
         {employeeId && <Legend swatch="ring-2 ring-[#ff8300] bg-white border-slate-200" label="ที่นั่งของฉัน" />}
         {teams.filter((t) => t.color).map((t) => (
           <div key={t.name} className="flex items-center gap-2">
@@ -205,7 +254,7 @@ export default function FloorMap({
             </div>
           )}
         <div
-          className="inline-grid gap-1.5 sm:gap-3 p-2.5 sm:p-8 rounded-xl sm:rounded-[1.6rem] border border-slate-200/80 shadow-2xl bg-[radial-gradient(rgba(4,164,204,0.12)_1px,transparent_1px)] [background-size:20px_20px] bg-white"
+          className="inline-grid gap-1.5 sm:gap-3 p-2.5 sm:p-8 rounded-xl sm:rounded-[1.6rem] border border-slate-200/80 shadow-2xl bg-white [background-image:linear-gradient(45deg,rgba(4,164,204,0.05)_25%,transparent_25%,transparent_75%,rgba(4,164,204,0.05)_75%)] [background-size:24px_24px]"
           style={{
             gridTemplateRows: rowTemplate,
             gridTemplateColumns: `repeat(${colCount}, var(--seat-cell-w))`,
@@ -221,7 +270,7 @@ export default function FloorMap({
                     gridRow: `${seat.grid_row - minRow + 1} / span 2`,
                     gridColumn: `${seat.grid_col - minCol + 1} / span ${colSpan}`,
                   }}
-                  className="flex h-full w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-amber-300 bg-gradient-to-br from-amber-50 to-orange-100/70 text-amber-700 shadow-sm select-none cursor-default"
+                  className="flex h-full w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-amber-300 bg-gradient-to-br from-amber-50 to-orange-100/70 text-amber-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_2px_5px_rgba(0,0,0,0.06)] select-none cursor-default"
                   title={seat.code}
                 >
                   <span className="text-3xl mb-1">🧑‍💼</span>
@@ -253,7 +302,7 @@ export default function FloorMap({
                 <div
                   key={seat.id}
                   style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
-                  className="flex h-full w-full flex-col items-center justify-center rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 shadow-sm font-semibold text-xs leading-tight select-none cursor-default"
+                  className="flex h-full w-full flex-col items-center justify-center rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_3px_rgba(0,0,0,0.05)] font-semibold text-xs leading-tight select-none cursor-default"
                   title={seat.code}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mb-0.5 text-emerald-600">
@@ -287,6 +336,25 @@ export default function FloorMap({
 
             const displayLabel = formatSeatLabel(seat.code, seat.source);
 
+            // Management desks: their own slate card with a brass nameplate, name only -- the
+            // walled ones additionally get a framed border so private rooms read off the map.
+            if (seat.rank) {
+              const rk = RANK_STYLE[seat.rank];
+              return (
+                <div
+                  key={seat.id}
+                  style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
+                  className={`relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-2xl px-1.5 text-center leading-tight shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_3px_10px_rgba(0,0,0,0.28)] select-none cursor-default ${rk.room}`}
+                  title={seat.code}
+                >
+                  <span className={`absolute inset-x-0 top-0 h-1.5 ${rk.plate}`} />
+                  <span className={`mt-1 truncate w-full text-[11px] sm:text-xs font-bold ${rk.name}`}>
+                    {formatDisplayName(seat.code)}
+                  </span>
+                </div>
+              );
+            }
+
             if (seat.source === "fixed") {
               return (
                 <div
@@ -296,7 +364,7 @@ export default function FloorMap({
                     gridColumn: seat.grid_col - minCol + 1,
                     ...(seat.fixedTeamColor ? { borderLeftColor: seat.fixedTeamColor, borderLeftWidth: 4 } : {}),
                   }}
-                  className={`flex h-full w-full flex-col items-center justify-center rounded-2xl border border-amber-300 text-amber-800 bg-gradient-to-br from-amber-50 to-amber-100/80 shadow-sm px-2 text-center text-xs leading-tight select-none cursor-default ${
+                  className={`relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-2xl border border-amber-300 text-amber-800 bg-gradient-to-br from-amber-50 to-amber-100/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_3px_rgba(0,0,0,0.06)] px-2 text-center text-xs leading-tight select-none cursor-default ${
                     seat.fixedWfh ? "opacity-60 border-dashed" : "opacity-90"
                   }`}
                   title={
@@ -307,6 +375,8 @@ export default function FloorMap({
                       : `${seat.code} (ที่นั่งประจำ)`
                   }
                 >
+                  {/* brass nameplate strip -- the one cue that this desk belongs to someone, not a bookable pool */}
+                  <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300" />
                   <span className="font-semibold mb-0.5 text-amber-700">🔒 {displayLabel}</span>
                   <span className="truncate w-full font-medium text-amber-600/70">
                     {seat.fixedTeamName ? `ทีม${seat.fixedTeamName}` : seat.fixedWfh ? "ประจำ · WFH" : "ประจำ"}
@@ -318,10 +388,10 @@ export default function FloorMap({
             const isMine = employeeId != null && seat.employee?.id === employeeId;
             const base =
               seat.source === "booked"
-                ? "bg-gradient-to-br from-[#44bbdb] to-[#04a4cc] border-[#04a4cc] text-white shadow-md hover:from-[#44bbdb]/95 hover:to-[#04a4cc]/95 hover:-translate-y-1 hover:shadow-[#04a4cc]/20"
+                ? "bg-gradient-to-br from-[#44bbdb] to-[#04a4cc] border-[#04a4cc] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_2px_6px_rgba(4,164,204,0.35)] hover:from-[#44bbdb]/95 hover:to-[#04a4cc]/95 hover:-translate-y-1"
                 : seat.source === "auto"
-                ? "bg-[#c1c8ab]/30 border-[#c1c8ab] text-[#04a4cc] shadow-sm hover:bg-[#c1c8ab]/45 hover:-translate-y-1"
-                : "bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm hover:bg-emerald-100 hover:border-emerald-400 hover:-translate-y-1";
+                ? "bg-[#c1c8ab]/30 border-[#c1c8ab] text-[#04a4cc] shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_1px_3px_rgba(0,0,0,0.08)] hover:bg-[#c1c8ab]/45 hover:-translate-y-1"
+                : "bg-emerald-50 border-emerald-300 text-emerald-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_3px_rgba(16,185,129,0.15)] hover:bg-emerald-100 hover:border-emerald-400 hover:-translate-y-1";
 
             const employeeName = seat.employee ? formatDisplayName(seat.employee.name) : "ว่าง";
             const teamColor = seat.employee?.team_color ?? null;
@@ -343,6 +413,7 @@ export default function FloorMap({
                 }`}
                 title={`${seat.code}${seat.employee ? ` — ทีม${seat.employee.team_name}` : ""}`}
               >
+                <DeskIcon occupied={seat.source !== "open"} />
                 <span className={`font-bold mb-0.5 sm:mb-0.5 text-xs sm:text-sm ${
                   seat.source === 'booked' ? 'text-white' :
                   seat.source === 'auto' ? 'text-[#04a4cc]' :

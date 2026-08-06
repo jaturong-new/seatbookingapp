@@ -30,6 +30,7 @@ export default async function FloorPage({
     code: a.seat.code,
     grid_row: a.seat.grid_row,
     grid_col: a.seat.grid_col,
+    rank: a.seat.rank,
     employee: a.employee
       ? { id: a.employee.id, name: a.employee.name, team_name: a.employee.team_name, team_color: a.employee.team_color }
       : null,

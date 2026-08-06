@@ -166,6 +166,10 @@ function getRealOccupantId(seat: Seat, weekStart: string): number | null | undef
 }
 
 export type Floor = { id: number; code: string; name: string };
+/** Management desk marker, set only on fixed-name seats. "executive_office" is a walled private
+ * room (framed on the floor map), "executive" a management desk out on the floor. */
+export type SeatRank = "executive_office" | "executive";
+
 export type Seat = {
   id: number;
   floor_id: number;
@@ -175,6 +179,7 @@ export type Seat = {
   full_code: string;
   grid_row: number;
   grid_col: number;
+  rank: SeatRank | null;
 };
 export type Team = { id: number; name: string; color: string | null };
 export type Employee = {
