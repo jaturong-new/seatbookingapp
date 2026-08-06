@@ -16,7 +16,6 @@ export type Me =
       email: string;
       name?: string | null;
       employee: EmployeeOption | null;
-      unclaimed?: EmployeeOption[];
     };
 
 // ── legacy localStorage identity (used only when auth is disabled) ──────────
