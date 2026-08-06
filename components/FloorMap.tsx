@@ -188,7 +188,10 @@ export default function FloorMap({
 
       <div
         ref={scrollRef}
-        className={`overflow-x-auto pb-8 touch-pan-x select-none ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+        // overflow-x-auto alone leaves overflow-y at its browser-computed default; pin it to
+        // visible explicitly so this container never claims vertical scroll/wheel for itself —
+        // that stays with the page, on every floor, regardless of how tall its content gets.
+        className={`overflow-x-auto overflow-y-visible overscroll-x-contain pb-8 touch-pan-x select-none ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
         onMouseDown={onDragMouseDown}
         onMouseMove={onDragMouseMove}
         onMouseUp={endDrag}
@@ -326,8 +329,8 @@ export default function FloorMap({
             return (
               <button
                 key={seat.id}
-                onClick={bookingEnabled ? () => setSelected(seat) : undefined}
-                disabled={pending === seat.id || !bookingEnabled}
+                onClick={() => setSelected(seat)}
+                disabled={pending === seat.id}
                 style={{
                   gridRow: seat.grid_row - minRow + 1,
                   gridColumn: seat.grid_col - minCol + 1,
@@ -336,7 +339,7 @@ export default function FloorMap({
                 className={`flex h-full w-full flex-col items-center justify-center rounded-lg sm:rounded-xl border transition-all duration-300 px-1 sm:px-1.5 text-center text-[10px] sm:text-xs leading-tight ${base} ${
                   isMine ? "ring-2 ring-[#ff8300] shadow-lg shadow-[#ff8300]/40 z-10" : ""
                 } ${pending === seat.id ? "opacity-50 scale-95" : ""} ${
-                  !bookingEnabled ? "cursor-default" : ""
+                  !bookingEnabled ? "cursor-not-allowed" : ""
                 }`}
                 title={`${seat.code}${seat.employee ? ` — ทีม${seat.employee.team_name}` : ""}`}
               >

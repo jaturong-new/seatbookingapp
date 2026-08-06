@@ -5,10 +5,9 @@ services:
     container_name: seatbooking
     restart: unless-stopped
 
-    # Bind to loopback only — put nginx/Caddy in front for TLS. With NEXTAUTH_URL left empty and
-    # AUTH_TRUST_HOST=true (see .env.local), NextAuth derives the callback URL from the proxy's
-    # X-Forwarded-Proto/X-Forwarded-Host headers instead, so the same .env.local works unchanged
-    # on both localhost and the real domain -- just make sure the proxy actually sets those headers.
+    # Bind to loopback only — put nginx/Caddy in front for TLS. NEXTAUTH_URL must always be set to
+    # the real public URL in .env.local (an empty value crashes next-auth/react on every page —
+    # its client-side URL parsing doesn't tolerate an unset origin the way the server side does).
     ports:
       - "127.0.0.1:3000:3000"
 
