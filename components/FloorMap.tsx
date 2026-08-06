@@ -121,18 +121,19 @@ export default function FloorMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected?.id, employeeId]);
 
-  const { rowCount, colCount, minRow, minCol } = useMemo(() => {
-    if (seats.length === 0) return { rowCount: 1, colCount: 1, minRow: 0, minCol: 0 };
+  const { rowTemplate, colCount, minRow, minCol } = useMemo(() => {
+    if (seats.length === 0) return { rowTemplate: "var(--seat-cell-h)", colCount: 1, minRow: 0, minCol: 0 };
     const minRow = Math.min(...seats.map((s) => s.grid_row));
     const minCol = Math.min(...seats.map((s) => s.grid_col));
     const maxRow = Math.max(...seats.map((s) => s.grid_row));
     const maxCol = Math.max(...seats.map((s) => s.grid_col));
-    return {
-      rowCount: maxRow - minRow + 1,
-      colCount: maxCol - minCol + 1,
-      minRow,
-      minCol,
-    };
+    const usedRows = new Set(seats.map((s) => s.grid_row));
+    // Row numbers between seats with a gap (e.g. an aisle) render as a thin strip instead of a
+    // full desk-height row -- a real gap still reads as one, just without eating a whole row.
+    const rowTemplate = Array.from({ length: maxRow - minRow + 1 }, (_, i) =>
+      usedRows.has(minRow + i) ? "var(--seat-cell-h)" : "0.75rem"
+    ).join(" ");
+    return { rowTemplate, colCount: maxCol - minCol + 1, minRow, minCol };
   }, [seats]);
 
   async function act(seatId: number, action: "book" | "release" | "clear", weeks?: number) {
@@ -203,7 +204,7 @@ export default function FloorMap({
         <div
           className="inline-grid gap-1.5 sm:gap-3 p-2.5 sm:p-8 rounded-xl sm:rounded-[1.6rem] border border-slate-200/80 shadow-2xl bg-[radial-gradient(rgba(4,164,204,0.12)_1px,transparent_1px)] [background-size:20px_20px] bg-white"
           style={{
-            gridTemplateRows: `repeat(${rowCount}, var(--seat-cell-h))`,
+            gridTemplateRows: rowTemplate,
             gridTemplateColumns: `repeat(${colCount}, var(--seat-cell-w))`,
           }}
         >
