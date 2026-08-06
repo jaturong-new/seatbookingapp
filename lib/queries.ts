@@ -7,15 +7,31 @@ type AttendanceRound = { round: number; week_start: string; names: string[] };
 
 let attendanceCache: { byWeek: Map<string, Set<string>>; knownNames: Set<string> } | null = null;
 
-/** Real per-week attendance for DEV, sourced from the "Booking Seat" sheet (round 1 = 2026-08-03).
- * Falls back to the synthetic group rotation for weeks/employees outside this sheet's coverage
- * (e.g. someone the sheet never scheduled a seat for at all — not a real "always WFH" signal). */
+/** Real per-week attendance sources, one per team without per-desk rotation data (they only know
+ * who's in vs. WFH that week, not which specific desk) — merged since a given week can come from either. */
+const ATTENDANCE_FILES = ["dev_attendance.json", "scrum_attendance.json"];
+
+/** Real per-week attendance, sourced from the "Booking Seat"/"Note.Scrum" sheets (round 1 =
+ * 2026-08-03). Falls back to the synthetic group rotation for weeks/employees outside these
+ * sheets' coverage (e.g. someone the sheet never scheduled a seat for at all — not a real
+ * "always WFH" signal). */
 function getRealAttendance() {
   if (attendanceCache) return attendanceCache;
-  const filePath = path.join(process.cwd(), "data", "dev_attendance.json");
-  const rounds: AttendanceRound[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-  const byWeek = new Map(rounds.map((r) => [r.week_start, new Set(r.names)]));
-  const knownNames = new Set(rounds.flatMap((r) => r.names));
+  const byWeek = new Map<string, Set<string>>();
+  const knownNames = new Set<string>();
+  for (const fileName of ATTENDANCE_FILES) {
+    const filePath = path.join(process.cwd(), "data", fileName);
+    if (!fs.existsSync(filePath)) continue;
+    const rounds: AttendanceRound[] = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    for (const round of rounds) {
+      const names = byWeek.get(round.week_start) ?? new Set<string>();
+      for (const name of round.names) {
+        names.add(name);
+        knownNames.add(name);
+      }
+      byWeek.set(round.week_start, names);
+    }
+  }
   attendanceCache = { byWeek, knownNames };
   return attendanceCache;
 }
@@ -35,7 +51,13 @@ let seatRoundsCache:
 /** Real per-week desk-round sources, one per team's rotating pool, each sourced from the
  * "Mobile Office" sheet family (see each file's own `source` field for exact sheet/import date).
  * Merged together below since a given week_start/seat can come from any of them. */
-const SEAT_ROUNDS_FILES = ["dev_seat_rounds.json", "nok_seat_rounds.json", "tester_seat_rounds.json", "sa_seat_rounds.json"];
+const SEAT_ROUNDS_FILES = [
+  "dev_seat_rounds.json",
+  "nok_seat_rounds.json",
+  "tester_seat_rounds.json",
+  "sa_seat_rounds.json",
+  "scrum_seat_rounds.json",
+];
 
 /** Real per-person, per-week desk assignment for each team's rotating pool. This is the *only*
  * place these desks are assigned to real people; outside its coverage (employee not in any
@@ -78,6 +100,25 @@ function getRealSeatRounds() {
 
   seatRoundsCache = { weeks, seatCodes, byWeek, reverseByWeek, fixedWfh };
   return seatRoundsCache;
+}
+
+/** Whether this team's pool can ever land a specific employee on a specific desk — either via the
+ * real per-desk seat-round sheets, or via the synthetic rotation (employee_rotation rows). Teams
+ * with neither (e.g. Scrum, whose source data only says which floor someone's on, not which desk)
+ * can never resolve an occupant for their pool seats, so those seats must stay "reserved for the
+ * team" rather than falling through to "open" just because nobody happens to be assigned this week. */
+function teamHasDeterministicSeating(teamId: number): boolean {
+  const hasRotation = getDb()
+    .prepare(
+      `SELECT 1 FROM employees e JOIN employee_rotation er ON er.employee_id = e.id WHERE e.team_id = ? LIMIT 1`
+    )
+    .get(teamId);
+  if (hasRotation) return true;
+  const poolSeats = getDb()
+    .prepare(`SELECT s.full_code as fullCode FROM team_seats ts JOIN seats s ON s.id = ts.seat_id WHERE ts.team_id = ?`)
+    .all(teamId) as { fullCode: string }[];
+  const { seatCodes } = getRealSeatRounds();
+  return poolSeats.some((s) => seatCodes.has(s.fullCode));
 }
 
 /** Whether a fixed-seat lead is WFH this week per the sheet's "กลุ่ม fix" rows, or undefined if
@@ -206,17 +247,6 @@ export function getEmployeeByEmail(email: string): (Employee & { team_name: stri
 }
 
 /** Names still available to claim on first sign-in: active, no email bound yet, and not a fixed-seat lead. */
-export function getUnclaimedEmployees(): (Employee & { team_name: string })[] {
-  return getDb()
-    .prepare(
-      `SELECT e.*, t.name as team_name FROM employees e JOIN teams t ON t.id = e.team_id
-       WHERE e.active = 1 AND e.email IS NULL
-         AND NOT EXISTS (SELECT 1 FROM seats s WHERE s.code = e.name)
-       ORDER BY e.name`
-    )
-    .all() as (Employee & { team_name: string })[];
-}
-
 export type ClaimResult =
   | { ok: true }
   | { ok: false; error: "email_taken" | "name_taken" | "not_found" };
@@ -346,10 +376,12 @@ export function getSeatAssignment(seat: Seat, weekStart: string): SeatAssignment
       return { seat, employee: null, source: "fixed", autoEmployee, fixedWfh, fixedTeamColor: owner?.team_color ?? null };
     }
   } else {
-    // A pool seat whose team has no roster at all (e.g. Scrum, reserved with no names entered yet)
-    // is never actually "open" -- it's just unstaffed. Show it as reserved for that team, not bookable.
+    // A pool seat whose team has no roster, or whose roster has no way to ever land on a specific
+    // desk (no per-desk rotation and never referenced by the real seat-round sheets — e.g. Scrum,
+    // which only tracks who's in the building, not which of its desks they sit at) is never
+    // actually "open" -- it's just unstaffed. Show it as reserved for that team, not bookable.
     const hasMembers = getDb().prepare(`SELECT 1 FROM employees WHERE team_id = ? LIMIT 1`).get(inPool.team_id);
-    if (!hasMembers) {
+    if (!hasMembers || !teamHasDeterministicSeating(inPool.team_id)) {
       return {
         seat,
         employee: null,

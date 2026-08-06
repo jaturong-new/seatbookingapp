@@ -52,7 +52,7 @@ export default async function TeamPage({
                     <span className="text-amber-500 font-semibold">WFH</span>
                   ) : seat && "code" in seat ? (
                     <Link href={`/floor/${seat.floor_code}?week=${weekStart}`} className="text-ocean-600 hover:text-ocean-700 font-semibold hover:underline">
-                      {seat.floor_code}-{seat.code}
+                      {seat.full_code}
                     </Link>
                   ) : (
                     <span className="text-slate-400">ไม่มีที่นั่ง</span>

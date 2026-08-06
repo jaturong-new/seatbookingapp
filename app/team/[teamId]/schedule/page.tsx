@@ -13,6 +13,21 @@ function formatShort(weekStart: string): string {
   return `${d}/${m}`;
 }
 
+function formatFull(dateStr: string): string {
+  const [y, m, d] = dateStr.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+function weekEndOf(weekStart: string): string {
+  const d = new Date(`${weekStart}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + 6);
+  return d.toISOString().slice(0, 10);
+}
+
+function formatWeekRange(weekStart: string): string {
+  return `สัปดาห์ ${formatFull(weekStart)} - ${formatFull(weekEndOf(weekStart))}`;
+}
+
 export default async function TeamSchedulePage({
   params,
   searchParams,
@@ -73,13 +88,17 @@ export default async function TeamSchedulePage({
         <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-sm bg-amber-100 border border-amber-300 inline-block" /> WFH</span>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50/50 shadow-inner">
+      <div className="overflow-auto max-h-[65vh] rounded-2xl border border-slate-200 bg-slate-50/50 shadow-inner">
         <table className="text-sm border-collapse">
-          <thead className="bg-slate-100 text-left text-slate-500 border-b border-slate-200">
+          <thead className="bg-slate-100 text-left text-slate-500">
             <tr>
-              <th className="px-4 py-3 font-semibold sticky left-0 bg-slate-100 z-10 whitespace-nowrap">ชื่อ</th>
+              <th className="px-4 py-3 font-semibold sticky top-0 left-0 bg-slate-100 z-20 whitespace-nowrap border-b border-slate-200">ชื่อ</th>
               {weekStarts.map((w) => (
-                <th key={w} className="px-2 py-3 font-semibold text-center whitespace-nowrap" title={w}>
+                <th
+                  key={w}
+                  className="px-2 py-3 font-semibold text-center whitespace-nowrap sticky top-0 bg-slate-100 z-10 border-b border-slate-200"
+                  title={formatWeekRange(w)}
+                >
                   {formatShort(w)}
                 </th>
               ))}
@@ -94,11 +113,12 @@ export default async function TeamSchedulePage({
                 {weeks.map(({ weekStart, wfh }) => (
                   <td key={weekStart} className="px-2 py-2.5 text-center">
                     <span
-                      className={`inline-block w-full rounded-md px-1.5 py-1 text-[11px] font-bold ${
+                      className={`inline-block w-full rounded-md px-1.5 py-1 text-[11px] font-bold cursor-default ${
                         wfh
                           ? "bg-amber-100 text-amber-700 border border-amber-300"
                           : "bg-emerald-100 text-emerald-700 border border-emerald-300"
                       }`}
+                      title={formatWeekRange(weekStart)}
                     >
                       {wfh ? "WFH" : "เข้า"}
                     </span>
