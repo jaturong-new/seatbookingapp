@@ -192,6 +192,11 @@ function ClaimPicker({ claimable }: { claimable: EmployeeOption[] }) {
         return;
       }
       invalidateMe();
+    } catch {
+      // Network failure, or a non-JSON error response (e.g. a 500 HTML page) blowing up
+      // r.json() -- without this the exception was silently swallowed and the button just
+      // went back to normal with zero feedback, looking like nothing happened.
+      setError("เชื่อมต่อไม่สำเร็จ ลองใหม่อีกครั้ง");
     } finally {
       setSubmitting(false);
     }
