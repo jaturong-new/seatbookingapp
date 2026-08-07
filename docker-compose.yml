@@ -31,5 +31,17 @@ services:
         max-size: "10m"
         max-file: "3"
 
+    # Joins the existing Nginx reverse proxy's network so it can reach this container directly
+    # by service name, instead of only through the 127.0.0.1 port binding above.
+    networks:
+      - n8nnet
+
 volumes:
   seatbooking-data:
+
+# n8nnet already exists on the host, created by another stack -- declared external so Compose
+# attaches to it instead of trying to create its own network of the same name. Nothing about this
+# app depends on n8n itself; it's just the network the reverse-proxy container happens to be on.
+networks:
+  n8nnet:
+    external: true
