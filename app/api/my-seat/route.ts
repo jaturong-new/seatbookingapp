@@ -2,19 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getEmployeeById, getEmployeeWeekSeat } from "@/lib/queries";
 import { weekStartOf, clampToFirstWeek } from "@/lib/rotation";
-import { hasReadAccess } from "@/lib/auth";
+import { resolveRequestedEmployeeId } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
-  if (!(await hasReadAccess())) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  // Identity comes from the session when auth is on — the employeeId in the query string is
+  // only cross-checked, never trusted as the lookup key.
+  const idParam = Number(req.nextUrl.searchParams.get("employeeId")) || null;
+  const resolved = await resolveRequestedEmployeeId(idParam);
+  if (!resolved.ok) {
+    return NextResponse.json({ error: resolved.error }, { status: resolved.status });
   }
-
-  const employeeId = Number(req.nextUrl.searchParams.get("employeeId"));
+  const employeeId = resolved.employeeId;
   const week = clampToFirstWeek(req.nextUrl.searchParams.get("week") ?? weekStartOf(new Date()));
 
-  if (!employeeId) {
-    return NextResponse.json({ error: "employeeId required" }, { status: 400 });
-  }
   const employee = getEmployeeById(employeeId);
   if (!employee) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
@@ -29,5 +29,12 @@ export async function GET(req: NextRequest) {
         })
       : null;
 
-  return NextResponse.json({ employee, week, seat, floor });
+  // Only the fields the card renders. Never spread the employee row straight out: it carries the
+  // person's Google email, which nothing on this screen needs.
+  return NextResponse.json({
+    employee: { id: employee.id, name: employee.name, team_name: employee.team_name },
+    week,
+    seat,
+    floor,
+  });
 }

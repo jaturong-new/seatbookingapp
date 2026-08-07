@@ -58,3 +58,9 @@ export function getDb(): Database.Database {
   }
   return global.__seatDb;
 }
+
+/** Where the live database file sits on disk -- for the admin DB-export route, which needs the
+ * path to stream the file itself, not just a connection to query it. */
+export function getDbPath(): string {
+  return DB_PATH;
+}

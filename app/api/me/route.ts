@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { AUTH_ENABLED, getSessionEmployee, getSessionUser } from "@/lib/auth";
+import { getClaimableEmployees } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 /** Who am I + which identity mode the app runs in. With auth on: session email + claimed
- * employee, plus the Google account's display name when not yet claimed (shown as-is; the
- * claim picker itself is disabled for now, so this intentionally never returns the roster). */
+ * employee. getSessionEmployee() already tried an automatic name match before we get here, so
+ * `employee: null` below means that failed (ambiguous name, format mismatch, or a fixed-seat
+ * lead who can't self-claim at all) -- the client falls back to a manual picker, so this
+ * response carries the still-open names/teams to fill it (no emails; this app already shows
+ * full rosters by name on every team page to any signed-in user, so this isn't new exposure). */
 export async function GET() {
   if (!AUTH_ENABLED) {
     return NextResponse.json({ authEnabled: false });
@@ -22,6 +26,7 @@ export async function GET() {
       email,
       name,
       employee: null,
+      claimable: getClaimableEmployees(),
     });
   }
   return NextResponse.json({

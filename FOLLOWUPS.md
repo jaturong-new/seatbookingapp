@@ -135,3 +135,59 @@ _(none open right now — see resolved section below)_
   ever wanted on the map, that list is the source to re-derive them from.
   Floor 32's ten locker placards were also deleted in the same pass (unused —
   no `team_seats`/`bookings` referenced them).
+- **(2026-08-07) Login whitelist (`data/login_whitelist.json`)**: sign-in is no
+  longer "anyone with an @ocean.co.th account". The 180 addresses on the list
+  supplied by the team (`wl.txt`) are the only ones that can get in;
+  `ALLOWED_EMAIL_DOMAIN` stays as a cheap outer guard, but the list is the real
+  gate. Deliberately a JSON file, not a table: adding or removing a person is a
+  one-file edit + `docker compose restart seatbooking`, never a database
+  overwrite on the live volume. The file also records each person's role
+  (DEV/TESTER/SA/PM/BA/UXUI/ITSOL) purely as provenance — nothing reads it.
+  Enforcement sits in `isLoginAllowed()` and is applied in *two* places: the
+  NextAuth `signIn` callback (blocks the login itself) and `getSessionEmail()`
+  (re-checked on every request, so removing someone doesn't wait out their JWT).
+  A missing or malformed file **fails closed** — everyone is locked out and the
+  server logs `[auth] cannot read ...` — rather than silently falling back to
+  domain-wide access, which is the exact thing the list exists to stop. Because
+  of that, `next.config.js` now lists `data/*.json` + `lib/schema.sql` under
+  `experimental.outputFileTracingIncludes`: they're read via
+  `path.join(process.cwd(), ...)`, which the build's static tracer cannot see,
+  so nothing guaranteed they reached `.next/standalone` before.
+- **(2026-08-07) Seat dialog was centring on the wrong box**: clicking a desk
+  opened the detail dialog somewhere down the page instead of on screen — from
+  the top of a long floor map you had to scroll to find it. The dialog was
+  already `fixed inset-0`; the cause was that `app/floor/[floorCode]/page.tsx`
+  wraps the map in a `backdrop-blur-md` card, and any non-`none` backdrop-filter
+  makes that element the containing block for `position: fixed` descendants, so
+  "the viewport" quietly became "that card". Fixed by portalling the dialog to
+  `document.body` (`createPortal`) rather than by dropping the blur, which is
+  wanted visually. Anything else fixed-positioned added inside `FloorMap` later
+  will hit the same trap and needs the same portal.
+- **(2026-08-07) `chief_office` rank**: พี่บังอร's room is now visually set apart
+  from the other two private rooms (ปรีชาชาญ on F24, เฉลิมพงษ์ on F32) — crown,
+  double gold frame, warm inner glow — since she is the most senior. Added as a
+  third `seats.rank` value rather than a name special-case, so the styling stays
+  data-driven. Expected to be exactly one seat. Note the live DB's `seats.rank`
+  column has **no** CHECK constraint (it arrived via `ALTER TABLE` in db.ts
+  migrate()), while `lib/schema.sql` does — a fresh DB from schema.sql will
+  reject any fourth value until that CHECK is updated too. The legend still
+  labels it "ห้องส่วนตัว" alongside the others: the map deliberately shows names
+  only, without job titles.
+- **(2026-08-07) 54/153 active employees pre-mapped to their login email**: user chose
+  "admin bulk-imports mapping in advance" over building a self-serve claim UI, so no one has to
+  pick their own name on first login. `wl.txt` only has email+role, no names, so matching was
+  done by romanizing each employee's Thai name (pythainlp, `engine="royin"`, temp venv, not a
+  project dependency) and fuzzy-matching against the email local part two independent ways: (1)
+  first name similarity + exact match on the first two romanized letters of the surname, (2)
+  first name similarity alone with a "mutual best match" requirement in both directions. Only
+  pairs where both employee-side and email-side agreed with no close runner-up were written to
+  `employees.email` — 17 confirmed by both methods, 27 more by method 1 alone, 10 more by method
+  2 alone, zero disagreements between the methods anywhere they overlapped. Verified against two
+  known ground-truth pairs first (chatnarin.ak, kittipong.su, both from real comments in the
+  source Excel). **Do not trust this technique further** — royin's whole-word romanization does
+  not reliably correspond to how a person's own surname got shortened to 2 letters in their real
+  email (e.g. นวหิรัญกุล -> royin "noirankun" but the real email is `...na@`, from reading just
+  "นว" as its own syllable "na", which royin's whole-word rule gets wrong) — that's exactly why
+  the other 99 were left unmapped rather than guessed. That list, with unconfirmed best-guesses to
+  speed up manual entry, is at `/home/chatnarinak/ai_projects/temp/seatbooking-email-mapping-todo.md`
+  — finish those through `/admin007`, not by trusting the "เดา" column blindly.

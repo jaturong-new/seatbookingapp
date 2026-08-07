@@ -30,6 +30,15 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
+  // data/*.json and lib/schema.sql are read at runtime via path.join(process.cwd(), ...), which the
+  // build's static tracer cannot see. Listed explicitly so they land in .next/standalone — without
+  // login_whitelist.json in particular the app fails closed and nobody can sign in.
+  // (Next 14 still keeps this under `experimental`; it moved to the top level in Next 15.)
+  experimental: {
+    outputFileTracingIncludes: {
+      "/**": ["./data/*.json", "./lib/schema.sql"],
+    },
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

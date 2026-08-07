@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { usePersonIdentity } from "./PersonPicker";
 
-type SeatRank = "executive_office" | "executive";
+type SeatRank = "chief_office" | "executive_office" | "executive";
 
 type SeatVM = {
   id: number;
@@ -23,8 +24,14 @@ type SeatVM = {
 };
 
 /** Management desks: a deep slate card with a brass nameplate, showing the name only.
- * "executive_office" adds the walled-room frame; the rest share one flat treatment. */
+ * "executive_office" adds the walled-room frame, "chief_office" is that same room turned up for
+ * the most senior person (crown, double gold frame, warm glow); the rest share one flat treatment. */
 const RANK_STYLE: Record<SeatRank, { room: string; plate: string; name: string }> = {
+  chief_office: {
+    room: "border-2 border-amber-200 bg-gradient-to-br from-[#3b2f14] via-[#1c1608] to-[#3b2f14] ring-2 ring-amber-400/70 ring-offset-2 ring-offset-[#0b3a4a] shadow-[inset_0_1px_0_rgba(255,236,170,0.35),0_0_18px_rgba(251,191,36,0.45),0_4px_14px_rgba(0,0,0,0.4)]",
+    plate: "bg-gradient-to-r from-amber-500 via-yellow-100 to-amber-500",
+    name: "text-amber-100 [text-shadow:0_0_8px_rgba(251,191,36,0.55)]",
+  },
   executive_office: {
     room: "border-2 border-amber-300 bg-gradient-to-br from-[#243b55] via-[#1b2a41] to-[#243b55] ring-2 ring-amber-300/45 ring-offset-1 ring-offset-white",
     plate: "bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300",
@@ -70,6 +77,24 @@ function DeskIcon({ occupied }: { occupied: boolean }) {
   );
 }
 
+/** Crown above the nameplate on the chief's room. Hidden on phones, where a 3rem cell has no
+ * vertical room to spare once the name is in. */
+function CrownIcon() {
+  return (
+    <svg
+      width="16"
+      height="12"
+      viewBox="0 0 24 18"
+      fill="currentColor"
+      className="hidden sm:block text-amber-300 drop-shadow-[0_0_4px_rgba(251,191,36,0.8)]"
+      aria-hidden
+    >
+      <path d="M2 15h20l1.4-11-6.2 4.2L12 1 6.8 8.2.6 4z" />
+      <rect x="2" y="16" width="20" height="2" rx="1" />
+    </svg>
+  );
+}
+
 function formatSeatLabel(code: string, source: string): string {
   if (source === "fixed") {
     // If it is a seat code like F5-A2, A2, etc., don't format it
@@ -100,6 +125,11 @@ export default function FloorMap({
   const [selected, setSelected] = useState<SeatVM | null>(null);
   const [maxWeeks, setMaxWeeks] = useState(5);
   const [numWeeks, setNumWeeks] = useState(1);
+
+  // The seat dialog is portalled to <body>, so it must wait for the client mount -- document
+  // doesn't exist during the server render.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const canBook = bookingEnabled && !!selected && !selected.employee && selected.source !== "fixed";
 
@@ -217,7 +247,9 @@ export default function FloorMap({
         {seats.some((s) => s.rank === "executive") && (
           <Legend swatch="bg-gradient-to-br from-[#26485c] to-[#1d3a4c] border-[#44bbdb]/55" label="ผู้บริหาร" />
         )}
-        {seats.some((s) => s.rank === "executive_office") && (
+        {/* chief_office is a private room too -- it shares this entry rather than getting its own,
+            since the map deliberately shows names without spelling out anyone's job title */}
+        {seats.some((s) => s.rank === "executive_office" || s.rank === "chief_office") && (
           <Legend swatch="bg-gradient-to-br from-[#243b55] to-[#1b2a41] border-amber-300" label="ห้องส่วนตัว" />
         )}
         {employeeId && <Legend swatch="ring-2 ring-[#ff8300] bg-white border-slate-200" label="ที่นั่งของฉัน" />}
@@ -340,15 +372,25 @@ export default function FloorMap({
             // walled ones additionally get a framed border so private rooms read off the map.
             if (seat.rank) {
               const rk = RANK_STYLE[seat.rank];
+              const isChief = seat.rank === "chief_office";
               return (
                 <div
                   key={seat.id}
                   style={{ gridRow: seat.grid_row - minRow + 1, gridColumn: seat.grid_col - minCol + 1 }}
-                  className={`relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-2xl px-1.5 text-center leading-tight shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_3px_10px_rgba(0,0,0,0.28)] select-none cursor-default ${rk.room}`}
+                  className={`relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-2xl px-1.5 text-center leading-tight select-none cursor-default ${
+                    isChief ? "z-10" : "shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_3px_10px_rgba(0,0,0,0.28)]"
+                  } ${rk.room}`}
                   title={seat.code}
                 >
-                  <span className={`absolute inset-x-0 top-0 h-1.5 ${rk.plate}`} />
-                  <span className={`mt-1 truncate w-full text-[11px] sm:text-xs font-bold ${rk.name}`}>
+                  <span className={`absolute inset-x-0 top-0 ${isChief ? "h-2" : "h-1.5"} ${rk.plate}`} />
+                  {/* soft gold wash so the chief's room glows from the inside, not just at the edge */}
+                  {isChief && (
+                    <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.28),transparent_65%)]" />
+                  )}
+                  {isChief && <CrownIcon />}
+                  <span
+                    className={`${isChief ? "mt-0.5" : "mt-1"} truncate w-full text-[11px] sm:text-xs font-bold ${rk.name}`}
+                  >
                     {formatDisplayName(seat.code)}
                   </span>
                 </div>
@@ -429,7 +471,12 @@ export default function FloorMap({
         </div>
       </div>
 
-      {selected && (
+      {/* Portalled to <body> on purpose. The floor page wraps this map in a `backdrop-blur-md`
+          card, and a backdrop-filter makes that card the containing block for `position: fixed`
+          descendants -- so an inline dialog would center on the *card*, i.e. somewhere down the
+          scrolled page, instead of on the screen. Rendering outside that subtree is what keeps
+          `fixed inset-0` meaning "the viewport" no matter where the user has scrolled to. */}
+      {mounted && selected && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#001722]/80 backdrop-blur-sm p-4 animate-fade-in-up" onClick={() => setSelected(null)}>
           <div className="w-full max-w-sm rounded-2xl bg-[#00222f] border border-[#04a4cc]/25 p-6 shadow-2xl transition-all" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-start mb-2">
@@ -523,7 +570,8 @@ export default function FloorMap({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

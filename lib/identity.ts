@@ -16,6 +16,9 @@ export type Me =
       email: string;
       name?: string | null;
       employee: EmployeeOption | null;
+      /** Only present when employee is null: automatic name-matching on sign-in couldn't resolve
+       * this account, so these are the still-unclaimed names to fill a manual picker with. */
+      claimable?: EmployeeOption[];
     };
 
 // ── legacy localStorage identity (used only when auth is disabled) ──────────

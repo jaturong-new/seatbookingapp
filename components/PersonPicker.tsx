@@ -6,6 +6,7 @@ import {
   fetchMe,
   getStoredEmployeeId,
   setStoredEmployeeId,
+  invalidateMe,
   IDENTITY_EVENT,
   type Me,
   type EmployeeOption,
@@ -160,6 +161,71 @@ function AccountMenu({
   );
 }
 
+/** Fallback for the rare account automatic name-matching couldn't resolve on sign-in (ambiguous
+ * name, a fixed-seat lead who can't self-claim, or a Google display name that doesn't carry the
+ * expected "English - Thai" format). One-shot: POST /api/claim, then invalidateMe() so every
+ * listener (this component, MySeatCard, FloorMap) refetches and sees the newly-claimed name. */
+function ClaimPicker({ claimable }: { claimable: EmployeeOption[] }) {
+  const [selected, setSelected] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function submit() {
+    if (!selected) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const r = await fetch("/api/claim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employeeId: Number(selected) }),
+      });
+      const body = await r.json();
+      if (!r.ok || !body.ok) {
+        setError(
+          body.error === "name_taken"
+            ? "ชื่อนี้ถูกผูกกับ Google account อื่นไปแล้ว"
+            : body.error === "email_taken"
+            ? "Google account นี้ผูกกับชื่ออื่นไปแล้ว"
+            : "ผูกชื่อไม่สำเร็จ ลองใหม่อีกครั้ง"
+        );
+        return;
+      }
+      invalidateMe();
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="mt-3 border-t border-[#04a4cc]/15 pt-3">
+      <p className="mb-2 text-xs font-medium text-amber-300">
+        ระบบจับคู่ชื่อให้อัตโนมัติไม่ได้ — กรุณาเลือกชื่อของคุณเอง (ทำครั้งเดียว)
+      </p>
+      <select
+        value={selected}
+        onChange={(e) => setSelected(e.target.value)}
+        className="w-full rounded-lg bg-[#00222f] border border-[#04a4cc]/25 text-white text-sm px-2 py-2 outline-none focus:border-[#44bbdb] transition-colors"
+      >
+        <option value="" className="bg-[#00222f] text-cyan-200/60">-- เลือกชื่อของคุณ --</option>
+        {claimable.map((e) => (
+          <option key={e.id} value={e.id} className="bg-[#00222f] text-white">
+            {e.name} ({e.team_name})
+          </option>
+        ))}
+      </select>
+      {error && <p className="mt-1.5 text-[11px] text-rose-300">{error}</p>}
+      <button
+        onClick={submit}
+        disabled={!selected || submitting}
+        className="mt-2 w-full rounded-lg bg-[#04a4cc] px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#44bbdb] disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {submitting ? "กำลังบันทึก..." : "ยืนยันชื่อนี้"}
+      </button>
+    </div>
+  );
+}
+
 export default function PersonPicker() {
   const { me } = useMe();
   const [open, setOpen] = useState(false);
@@ -188,7 +254,8 @@ export default function PersonPicker() {
     );
   }
 
-  // signed in, not yet mapped to a name — display only for now (claim picker disabled, see below)
+  // signed in, not yet mapped — automatic name match on sign-in couldn't resolve this account,
+  // so fall back to a manual picker over the still-unclaimed names.
   if (!me.employee) {
     const displayName = me.name ? extractThaiName(me.name) : me.email;
     return (
@@ -207,6 +274,7 @@ export default function PersonPicker() {
         <p className="mt-0.5 truncate text-[11px] text-cyan-200/40" title={me.email}>
           {me.email}
         </p>
+        <ClaimPicker claimable={me.claimable ?? []} />
         <div className="mt-3 border-t border-[#04a4cc]/15 pt-3">
           <button
             onClick={() => signOut()}

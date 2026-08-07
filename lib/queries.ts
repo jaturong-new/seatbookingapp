@@ -168,7 +168,7 @@ function getRealOccupantId(seat: Seat, weekStart: string): number | null | undef
 export type Floor = { id: number; code: string; name: string };
 /** Management desk marker, set only on fixed-name seats. "executive_office" is a walled private
  * room (framed on the floor map), "executive" a management desk out on the floor. */
-export type SeatRank = "executive_office" | "executive";
+export type SeatRank = "chief_office" | "executive_office" | "executive";
 
 export type Seat = {
   id: number;
@@ -280,6 +280,66 @@ export function claimEmployeeEmail(employeeId: number, email: string): ClaimResu
     if (err.code === "SQLITE_CONSTRAINT_UNIQUE") return { ok: false, error: "email_taken" };
     throw err;
   }
+}
+
+/** The employees.name cleanup shared by both auto-claim matching and the manual claim picker:
+ * strip a nickname in parens ("กิตติพงษ์ (ตี๋)" -> "กิตติพงษ์") and a team-code prefix some
+ * fixed-seat rows carry ("SA : ณภัค" -> "ณภัค"). Matching is exact-after-cleanup only — no fuzzy
+ * scoring here, unlike the one-off email-mapping script this replaces; ambiguity always falls
+ * through to the manual picker rather than guessing. */
+function cleanEmployeeName(raw: string): string {
+  return raw
+    .replace(/\s*\([^)]+\)/g, "")
+    .replace(/^[A-Za-z0-9\s]+:\s*/, "")
+    .trim();
+}
+
+/** Google Workspace display names here are consistently "English Name - ไทย ชื่อ" -- pull out
+ * the Thai segment since employee records are always Thai names. Duplicated from the equivalent
+ * client-side helper in PersonPicker.tsx (kept separate on purpose: that one is UI display
+ * formatting, this one feeds an identity match and must stay auditable on its own). */
+function extractThaiSegment(fullName: string): string {
+  const parts = fullName.split(/\s*-\s*/);
+  const thaiPart = parts.find((p) => /[฀-๿]/.test(p));
+  return (thaiPart ?? fullName).trim();
+}
+
+/** Active, unclaimed, not a fixed-seat lead (mirrors claimEmployeeEmail's own eligibility check —
+ * a fixed-seat row's `name` is a seat-code placeholder, not a real full name). The set either
+ * auto-claim or the manual picker is allowed to bind. */
+function getClaimableEmployeesRaw(): { id: number; name: string; team_name: string }[] {
+  return getDb()
+    .prepare(
+      `SELECT e.id, e.name, t.name as team_name FROM employees e JOIN teams t ON t.id = e.team_id
+       WHERE e.active = 1 AND e.email IS NULL
+         AND NOT EXISTS (SELECT 1 FROM seats s WHERE s.code = e.name)
+       ORDER BY e.name`
+    )
+    .all() as { id: number; name: string; team_name: string }[];
+}
+
+/** Names still open for the manual claim picker (fallback when auto-claim below can't resolve
+ * someone) — no email in this payload, only names/teams, which the app already shows on every
+ * team roster page to any signed-in user. */
+export function getClaimableEmployees(): { id: number; name: string; team_name: string }[] {
+  return getClaimableEmployeesRaw();
+}
+
+/** Best-effort, zero-guess auto-claim: on first sign-in, try to bind the Google account straight
+ * to its employee row by matching the account's Thai display name against unclaimed employees,
+ * exact after cleanup. Silent no-op on zero or multiple matches -- ambiguity (e.g. two people
+ * with the same cleaned name) always falls through to the manual picker, never picks a guess. */
+export function tryAutoClaimByName(
+  email: string,
+  googleName: string | null
+): (Employee & { team_name: string }) | null {
+  if (!googleName) return null;
+  const target = cleanEmployeeName(extractThaiSegment(googleName));
+  if (!target) return null;
+  const matches = getClaimableEmployeesRaw().filter((c) => cleanEmployeeName(c.name) === target);
+  if (matches.length !== 1) return null;
+  const result = claimEmployeeEmail(matches[0].id, email);
+  return result.ok ? getEmployeeByEmail(email) ?? null : null;
 }
 
 /** Admin: set or clear an employee's email binding directly (fix wrong claims). */

@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS floors (
 -- vertical column of desks (grid_col fixed, grid_row increasing) even though their code numbers
 -- don't run top-to-bottom, so layout must never be inferred from row_letter/col_number alone.
 -- rank: management desk marker, NULL for ordinary desks. Only ever set on fixed-name seats.
+--   'chief_office'     = the most senior person's room -- same walled room, dressed up (crown,
+--                        heavier gold frame, glow). Expected to be exactly one seat.
 --   'executive_office' = walled private room (drawn with a frame on the floor map)
 --   'executive'        = management desk out on the floor
 -- The org hierarchy behind these (who is chief vs ผอ. vs รองผอ.) is deliberately not stored:
@@ -23,7 +25,7 @@ CREATE TABLE IF NOT EXISTS seats (
   full_code TEXT NOT NULL UNIQUE,
   grid_row INTEGER NOT NULL,
   grid_col INTEGER NOT NULL,
-  rank TEXT CHECK (rank IN ('executive_office', 'executive'))
+  rank TEXT CHECK (rank IN ('chief_office', 'executive_office', 'executive'))
 );
 
 -- color: hex swatch used to tell teams apart at a glance on the shared floor map (e.g. "#04a4cc")

@@ -9,26 +9,9 @@ import {
   clearOverride,
 } from "@/lib/queries";
 import { getDb } from "@/lib/db";
-import { AUTH_ENABLED, getSessionEmail } from "@/lib/auth";
+import { assertAdmin } from "@/lib/auth";
 import { weekStartOf, clampToFirstWeek } from "@/lib/rotation";
 import WeekNav from "@/components/WeekNav";
-
-function adminEmails(): string[] {
-  return (process.env.ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((s) => s.trim().toLowerCase())
-    .filter(Boolean);
-}
-
-/** Admin gate: when auth is on and ADMIN_EMAILS is set, only those Google accounts may enter
- * (and use the actions below). Auth off = legacy mode, page stays open as before. */
-async function assertAdmin(): Promise<boolean> {
-  if (!AUTH_ENABLED) return true;
-  const allowed = adminEmails();
-  if (allowed.length === 0) return true; // not configured -> open (dev mode)
-  const email = await getSessionEmail();
-  return !!email && allowed.includes(email);
-}
 
 async function addEmployeeAction(formData: FormData) {
   "use server";
@@ -117,7 +100,7 @@ export default async function AdminPage({ searchParams }: { searchParams: { week
       <div className="max-w-md mx-auto mt-16 rounded-2xl border border-rose-200 bg-white/90 p-8 text-center shadow-xl">
         <div className="text-3xl mb-3">🚫</div>
         <h1 className="text-xl font-bold text-rose-600 mb-2">ไม่มีสิทธิ์เข้าถึงหน้านี้</h1>
-        <p className="text-sm text-slate-500">ต้อง login ด้วย Google account ที่อยู่ในรายชื่อ admin (ADMIN_EMAILS)</p>
+        <p className="text-sm text-slate-500">ต้อง login ด้วย Google account ที่อยู่ในรายชื่อ admin (ตั้งค่าที่ ADMIN_EMAILS)</p>
       </div>
     );
   }
@@ -130,7 +113,19 @@ export default async function AdminPage({ searchParams }: { searchParams: { week
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-extrabold text-ocean-900 tracking-tight">แผงควบคุมระบบ (Admin)</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-3xl font-extrabold text-ocean-900 tracking-tight">แผงควบคุมระบบ (Admin)</h1>
+        <a
+          href="/api/admin/db-export"
+          className="inline-flex items-center gap-2 rounded-lg bg-ocean-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-ocean-500/20 transition-all hover:bg-ocean-500"
+        >
+          ดาวน์โหลด Database (.db)
+        </a>
+      </div>
+      <p className="-mt-4 text-xs text-slate-500">
+        ไฟล์ที่ได้คือข้อมูลล่าสุด ณ ตอนกดดาวน์โหลด (ไม่ใช่ snapshot ตอน build) —
+        เก็บไว้สำรอง/ย้ายเครื่องได้ แต่มีข้อมูล email พนักงานจริงอยู่ในไฟล์ อย่าส่งต่อโดยไม่ระวัง
+      </p>
 
       <section className="rounded-2xl border border-slate-200 bg-white/90 backdrop-blur-md p-6 shadow-xl">
         <h2 className="mb-4 font-bold text-ocean-900 text-lg flex items-center gap-2">
